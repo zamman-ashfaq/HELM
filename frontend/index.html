@@ -10,13 +10,18 @@
 <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
-<div class="shell" data-page="mission" data-title="Mission Control" data-crumb="Mission Control">
-  <aside class="sidebar"></aside>
-  <div class="main">
-    <header class="topbar"></header>
+<div class="shell" data-page="mission" data-title="Mission Control">
+  <header class="sitehead"></header>
 
-    <main class="page">
-      <section class="hero rise" aria-labelledby="heroTitle">
+  <main class="page">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-stars" aria-hidden="true"></div>
+      <figure class="hero-shot">
+        <img src="assets/iss-astronaut.jpg" width="736" height="1104"
+             alt="Astronaut in a spacesuit floating inside an International Space Station module">
+      </figure>
+
+      <div class="wrap hero-inner">
         <div class="hero-body">
           <span class="hero-eyebrow"><span class="bar"></span>HELM · Crew health system</span>
           <h1 class="hero-title" id="heroTitle">Astronaut Health Monitoring System</h1>
@@ -27,15 +32,13 @@
             <a class="btn btn-ghost" href="assistant.html">Ask the AI assistant</a>
           </div>
         </div>
-        <div class="hero-media">
-          <img src="assets/iss-astronaut.jpg" width="736" height="1104"
-               alt="Astronaut in a spacesuit floating inside an International Space Station module">
-          <div class="hero-frame" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-          <div class="hero-scanline" aria-hidden="true"></div>
-          <div class="hero-tag" id="heroTag"><span>Internal view · US Lab</span><b>CREW B · TRANSIT</b></div>
-        </div>
-      </section>
+        <div class="hero-tag" id="heroTag"></div>
+      </div>
+    </section>
 
+    <nav class="tabbar" aria-label="Primary"></nav>
+
+    <div class="wrap stack">
       <section class="daybar" id="daybar" aria-label="Mission day selection"></section>
 
       <section class="status-rail" id="vitals" aria-label="Current vitals"></section>
@@ -61,16 +64,18 @@
         <div class="panel" id="trendPanel"></div>
         <div class="panel" id="feedPanel"></div>
       </section>
-    </main>
+    </div>
+  </main>
 
-    <footer class="foot">
-      <span>HELM decision-support prototype · simulated crew data</span>
-      <span class="sep">|</span>
-      <span>Not a medical device. Radiation, CO2, oxygen, sleep and exercise bands are team choices anchored on NASA numbers (see <span class="mono">knowledge/</span>).</span>
-      <span class="sep">|</span>
-      <span>Runs offline from local files.</span>
-    </footer>
-  </div>
+  <footer class="foot">
+    <span>HELM decision-support prototype · simulated crew data</span>
+    <span class="sep">|</span>
+    <span>Not a medical device. Radiation, CO2, oxygen, sleep and exercise bands are team choices anchored on NASA numbers (see <span class="mono">knowledge/</span>).</span>
+    <span class="foot-status">
+      <span class="dot-row"><span class="dot" id="llmDot"></span><span id="llmText">Advisor idle</span></span>
+      <span class="dot-row"><span class="dot" id="queueDot"></span><span id="offlineCount">0 check-ins stored</span><span class="sep">·</span><span id="queueText">Sync idle</span></span>
+    </span>
+  </footer>
 </div>
 
 <script src="js/core.js"></script>

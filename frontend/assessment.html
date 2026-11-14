@@ -11,21 +11,26 @@
 <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
-<div class="shell" data-page="assessment" data-title="Health Assessment" data-crumb="Health Assessment">
-  <aside class="sidebar"></aside>
+<div class="shell" data-page="assessment" data-title="Health Assessment">
   <div class="main">
-    <header class="topbar"></header>
+    <header class="sitehead"></header>
 
     <main class="page">
-      <div class="panel-head rise" style="margin-bottom:0">
-        <div>
-          <span class="eyebrow">Crew check-in</span>
-          <h1 style="font-size:clamp(20px,1.9vw,26px);margin-top:6px">Health assessment</h1>
-          <p class="muted small" style="margin-top:4px">Five domains · validated against <span class="mono">data/medical_thresholds.json</span> · stored locally first, synced when the link is up.</p>
+      <header class="pagehead">
+        <div class="wrap panel-head rise" style="margin-bottom:0">
+          <div>
+            <span class="eyebrow">Crew check-in</span>
+            <h1>Health assessment</h1>
+            <p class="muted small" style="margin-top:4px">Five domains · validated against <span class="mono">data/medical_thresholds.json</span> · stored locally first, synced when the link is up.</p>
+          </div>
+          <span class="spacer"></span>
+          <a class="btn btn-sm btn-ghost" href="analytics.html">History</a>
         </div>
-        <span class="spacer"></span>
-        <a class="btn btn-sm btn-ghost" href="analytics.html">History</a>
-      </div>
+      </header>
+
+      <nav class="tabbar" aria-label="Primary"></nav>
+
+      <div class="wrap stack">
 
       <section aria-label="Assessment category">
         <div class="cat-tabs" id="tabs" role="tablist"></div>
@@ -50,12 +55,17 @@
           <div class="panel" id="flags"></div>
         </aside>
       </section>
+      </div>
     </main>
 
     <footer class="foot">
       <span>Simulated crew data · decision-support prototype</span>
       <span class="sep">|</span>
       <span>Not a medical device. Bands marked <span class="mono">app</span> are team choices, not NASA limits.</span>
+      <span class="foot-status">
+        <span class="dot-row"><span class="dot" id="llmDot"></span><span id="llmText">Advisor idle</span></span>
+        <span class="dot-row"><span class="dot" id="queueDot"></span><span id="offlineCount">0 check-ins stored</span><span class="sep">·</span><span id="queueText">Sync idle</span></span>
+      </span>
     </footer>
   </div>
 </div>

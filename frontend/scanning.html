@@ -11,21 +11,26 @@
 <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
-<div class="shell" data-page="scanning" data-title="Physical Scan" data-crumb="Physical Scan">
-  <aside class="sidebar"></aside>
+<div class="shell" data-page="scanning" data-title="Physical Assessment">
   <div class="main">
-    <header class="topbar"></header>
+    <header class="sitehead"></header>
 
     <main class="page">
-      <div class="panel-head rise" style="margin-bottom:0">
-        <div>
-          <span class="eyebrow">Computer vision · on device</span>
-          <h1 style="font-size:clamp(20px,1.9vw,26px);margin-top:6px">Physical assessment</h1>
-          <p class="muted small" style="margin-top:4px">Record a short movement sample. Everything is processed locally — the video never leaves this device.</p>
+      <header class="pagehead">
+        <div class="wrap panel-head rise" style="margin-bottom:0">
+          <div>
+            <span class="eyebrow">Computer vision · on device</span>
+            <h1>Physical assessment</h1>
+            <p class="muted small" style="margin-top:4px">Record a short movement sample. Everything is processed locally — the video never leaves this device.</p>
+          </div>
+          <span class="spacer"></span>
+          <span class="pill" id="modePill"></span>
         </div>
-        <span class="spacer"></span>
-        <span class="pill" id="modePill"></span>
-      </div>
+      </header>
+
+      <nav class="tabbar" aria-label="Primary"></nav>
+
+      <div class="wrap stack">
 
       <section class="scan-grid">
         <div class="scan-main">
@@ -83,12 +88,17 @@
         Fatigue and mobility signals here are screening aids built from movement, sleep and self-report.
         Video alone cannot diagnose a condition, and nothing on this page is a medical result.
       </p>
+      </div>
     </main>
 
     <footer class="foot">
       <span id="srcFoot">Vision: local</span>
       <span class="sep">|</span>
       <span>Video stays on the device · no upload, no cloud inference</span>
+      <span class="foot-status">
+        <span class="dot-row"><span class="dot" id="llmDot"></span><span id="llmText">Advisor idle</span></span>
+        <span class="dot-row"><span class="dot" id="queueDot"></span><span id="offlineCount">0 check-ins stored</span><span class="sep">·</span><span id="queueText">Sync idle</span></span>
+      </span>
     </footer>
   </div>
 </div>

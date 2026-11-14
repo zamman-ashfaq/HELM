@@ -4,35 +4,89 @@
    ========================================================================== */
 
 /* ==========================================================================
-   1 · MISSION CONTROL — cinematic
+   1 · MISSION CONTROL — cinematic, full-bleed hero
    ========================================================================== */
 .hero {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-  min-height: clamp(320px, 44vh, 470px);
-  border-radius: 22px;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(400px, 58vh, 680px);
+  padding-block: 96px clamp(28px, 3.2vw, 46px);
   overflow: hidden;
-  border: 1px solid var(--line-hi);
   background:
-    radial-gradient(700px 340px at 8% 0%, rgba(34, 211, 238, 0.13), transparent 62%),
-    linear-gradient(120deg, #08101d 0%, #060a12 62%, #04060c 100%);
-  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55);
+    radial-gradient(900px 460px at 84% 16%, rgba(34, 211, 238, 0.12), transparent 68%),
+    radial-gradient(1100px 520px at 2% 108%, rgba(96, 132, 255, 0.12), transparent 62%),
+    linear-gradient(118deg, #05080f 0%, #070d17 46%, #04060c 100%);
+  border-bottom: 1px solid var(--line);
 }
-.hero::before {
-  /* faint blueprint grid */
-  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.28;
+/* A starfield drawn with gradients: no extra image to ship, works offline.
+   The field is concentrated on the left, where the type sits. */
+.hero-stars {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.9;
+  background-repeat: no-repeat;
   background-image:
-    linear-gradient(rgba(122, 190, 230, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(122, 190, 230, 0.09) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: linear-gradient(90deg, #000 0%, transparent 68%);
+    radial-gradient(1.5px 1.5px at 3% 16%, rgba(255, 255, 255, 0.85), transparent 55%),
+    radial-gradient(1px 1px at 7% 44%, rgba(255, 255, 255, 0.5), transparent 55%),
+    radial-gradient(2px 2px at 9% 72%, rgba(210, 240, 255, 0.8), transparent 58%),
+    radial-gradient(1px 1px at 12% 28%, rgba(255, 255, 255, 0.45), transparent 55%),
+    radial-gradient(1.4px 1.4px at 15% 58%, rgba(255, 255, 255, 0.6), transparent 55%),
+    radial-gradient(1px 1px at 18% 88%, rgba(255, 255, 255, 0.35), transparent 55%),
+    radial-gradient(1.8px 1.8px at 21% 12%, rgba(255, 255, 255, 0.7), transparent 58%),
+    radial-gradient(1px 1px at 24% 40%, rgba(255, 255, 255, 0.4), transparent 55%),
+    radial-gradient(1.3px 1.3px at 27% 66%, rgba(255, 255, 255, 0.55), transparent 55%),
+    radial-gradient(2.2px 2.2px at 30% 22%, rgba(200, 238, 255, 0.85), transparent 60%),
+    radial-gradient(1px 1px at 33% 80%, rgba(255, 255, 255, 0.4), transparent 55%),
+    radial-gradient(1.4px 1.4px at 36% 50%, rgba(255, 255, 255, 0.5), transparent 55%),
+    radial-gradient(1px 1px at 39% 6%, rgba(255, 255, 255, 0.45), transparent 55%),
+    radial-gradient(1.6px 1.6px at 42% 34%, rgba(255, 255, 255, 0.65), transparent 58%),
+    radial-gradient(1px 1px at 45% 70%, rgba(255, 255, 255, 0.35), transparent 55%),
+    radial-gradient(1.9px 1.9px at 48% 14%, rgba(255, 255, 255, 0.6), transparent 58%),
+    radial-gradient(1px 1px at 51% 56%, rgba(255, 255, 255, 0.4), transparent 55%),
+    radial-gradient(1.3px 1.3px at 54% 90%, rgba(255, 255, 255, 0.45), transparent 55%),
+    radial-gradient(1.2px 1.2px at 57% 26%, rgba(255, 255, 255, 0.5), transparent 55%),
+    radial-gradient(1.7px 1.7px at 62% 62%, rgba(255, 255, 255, 0.35), transparent 58%),
+    radial-gradient(1px 1px at 68% 20%, rgba(255, 255, 255, 0.3), transparent 55%),
+    radial-gradient(1.4px 1.4px at 76% 74%, rgba(255, 255, 255, 0.3), transparent 55%),
+    radial-gradient(1px 1px at 88% 40%, rgba(255, 255, 255, 0.25), transparent 55%);
+}
+/* The crew photograph fills the right of the band and melts into the page on
+   its left edge, so the type sits on the dark side of the frame. */
+.hero-shot {
+  position: absolute; top: 0; right: 0; bottom: 0; z-index: 1;
+  width: min(46vw, 860px);
+  margin: 0;
+}
+.hero-shot img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 24%;
+  filter: saturate(0.95) contrast(1.06) brightness(0.88);
+}
+.hero-shot::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, #05080f 0%, rgba(5, 8, 15, 0.55) 14%, rgba(5, 8, 15, 0) 46%);
+}
+/* top and bottom fades: the strip above and the tabs below both read as glass */
+.hero::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(4, 7, 13, 0.66) 0%, rgba(4, 7, 13, 0) 30%),
+    linear-gradient(0deg, rgba(5, 8, 15, 0.8) 0%, rgba(5, 8, 15, 0) 34%);
+}
+.hero-inner {
+  position: relative; z-index: 3;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
 }
 .hero-body {
   position: relative; z-index: 2;
-  display: flex; flex-direction: column; justify-content: center;
-  gap: clamp(10px, 1.1vw, 16px);
-  padding: clamp(20px, 2.6vw, 42px);
+  display: flex; flex-direction: column;
+  gap: clamp(10px, 1.1vw, 15px);
+  max-width: 640px;
 }
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
@@ -40,12 +94,12 @@
 }
 .hero-eyebrow .bar { width: 26px; height: 1px; background: currentColor; opacity: 0.65; }
 .hero-title {
-  font-size: clamp(23px, 2.45vw, 39px);
-  line-height: 1.06;
-  letter-spacing: 0.015em;
+  font-size: clamp(30px, 3.5vw, 54px);
+  line-height: 1.03;
+  letter-spacing: 0.012em;
   text-transform: uppercase;
   font-weight: 660;
-  max-width: 20ch;
+  max-width: 100%;
   text-wrap: balance;
   background: linear-gradient(100deg, #ffffff 25%, #b9e6ff 70%, #7dd3fc 100%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -60,46 +114,30 @@
 .hero-chips .chip { background: rgba(6, 12, 22, 0.72); border-color: rgba(34, 211, 238, 0.22); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
 
-.hero-media { position: relative; min-height: 220px; overflow: hidden; }
-.hero-media img {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  object-position: 50% 42%;
-  filter: saturate(0.92) contrast(1.04) brightness(0.9);
-  transform: scale(1.02);
-}
-.hero-media::before {
-  content: ""; position: absolute; inset: 0; z-index: 2;
-  background:
-    linear-gradient(90deg, #070b14 0%, rgba(7, 11, 20, 0.85) 14%, rgba(7, 11, 20, 0.15) 48%, rgba(4, 6, 12, 0.55) 100%),
-    linear-gradient(0deg, rgba(4, 6, 12, 0.9) 0%, transparent 42%);
-}
-.hero-media::after {
-  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-  background: radial-gradient(120% 90% at 72% 32%, transparent 45%, rgba(4, 6, 12, 0.6) 100%);
-}
-.hero-frame { position: absolute; inset: 14px; z-index: 4; pointer-events: none; }
-.hero-frame span {
-  position: absolute; width: 22px; height: 22px;
-  border: 1px solid rgba(125, 233, 247, 0.55);
-}
-.hero-frame span:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
-.hero-frame span:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
-.hero-frame span:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
-.hero-frame span:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
-.hero-scanline {
-  position: absolute; left: 0; right: 0; top: 0; height: 2px; z-index: 5;
-  background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.85), transparent);
-  box-shadow: 0 0 22px rgba(34, 211, 238, 0.6);
-  animation: scanSweep 7s ease-in-out infinite;
-}
+/* glass caption sitting on the photograph, right-hand side of the band */
 .hero-tag {
-  position: absolute; z-index: 6; left: 26px; bottom: 24px;
   display: flex; flex-direction: column; gap: 3px;
+  padding: 9px 13px;
+  border: 1px solid var(--line-hi);
+  border-radius: 12px;
+  background: rgba(4, 8, 15, 0.55);
+  backdrop-filter: blur(8px);
   font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233, 242, 255, 0.7);
 }
 .hero-tag b { color: var(--cyan-soft); letter-spacing: 0.16em; font-size: 10.5px; }
+
+/* ---------- header band used by the four inner pages ---------- */
+.pagehead {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(24px, 2.6vw, 36px) clamp(20px, 2.2vw, 28px);
+  background:
+    radial-gradient(820px 260px at 6% -50%, rgba(34, 211, 238, 0.14), transparent 70%),
+    radial-gradient(700px 240px at 92% -60%, rgba(139, 125, 255, 0.12), transparent 72%),
+    linear-gradient(180deg, rgba(9, 16, 28, 0.92), rgba(5, 9, 16, 0.5));
+}
+.pagehead .panel-head { align-items: flex-end; margin-bottom: 0; }
+.pagehead h1 { font-size: clamp(22px, 2.2vw, 31px); margin-top: 7px; }
 
 /* status rail under the hero */
 .status-rail { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
@@ -325,7 +363,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 312px;
   gap: clamp(12px, 1.3vw, 18px);
-  height: clamp(410px, calc(100vh - 268px), 760px);
+  height: clamp(380px, calc(100vh - 330px), 760px);
   min-height: 0;
 }
 /* The three side panels are taller than the chat on a 768 px laptop, so the
@@ -570,13 +608,18 @@
 }
 
 @media (max-width: 900px) {
-  .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; }
-  .hero-media { order: -1; min-height: 190px; max-height: 240px; }
-  .hero-media::before {
+  /* Narrow screens: the photograph becomes the backdrop of the whole band and
+     a heavier scrim keeps the headline legible. */
+  .hero { min-height: clamp(330px, 54vh, 420px); padding-block: 88px 28px; }
+  .hero-shot { width: 100%; }
+  .hero-shot img { object-position: 50% 18%; }
+  .hero-shot::after {
     background:
-      linear-gradient(0deg, #070b14 4%, rgba(7, 11, 20, 0.35) 55%, rgba(4, 6, 12, 0.7) 100%);
+      linear-gradient(90deg, rgba(5, 8, 15, 0.72) 0%, rgba(5, 8, 15, 0.1) 70%),
+      linear-gradient(180deg, rgba(5, 8, 15, 0.5) 0%, rgba(5, 8, 15, 0.86) 58%, #05080f 100%);
   }
-  .hero-title { max-width: none; }
+  .hero-inner { grid-template-columns: minmax(0, 1fr); }
+  .hero-tag { display: none; }
   .wellness-card { grid-template-columns: 108px minmax(0, 1fr); }
   .cat-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ana-grid { grid-template-columns: minmax(0, 1fr); }
@@ -592,13 +635,11 @@
 
 /* short viewports (1366×768 laptops) */
 @media (max-height: 800px) {
-  .hero { min-height: 300px; }
-  /* No disclaimer and no subtitle on the assistant here: the chat bubble and the
-     engine badge already say the same thing, and the three side panels need
-     the room to stay whole. */
-  .chat { height: clamp(400px, calc(100vh - 208px), 620px); }
-  .page > .disclaimer { display: none; }
-  .shell[data-page="assistant"] .page > .panel-head p.small { display: none; }
-  .shell[data-page="assistant"] .page > .panel-head h1 { margin-top: 2px; }
+  /* The assistant page drops the subtitle here: the engine badge already says
+     the same thing, and the composer has to stay above the fold. */
+  .chat { height: clamp(340px, calc(100vh - 330px), 620px); }
+  .stack > .disclaimer { display: none; }
+  .shell[data-page="assistant"] .pagehead .panel-head p.small { display: none; }
+  .shell[data-page="assistant"] .pagehead .panel-head h1 { margin-top: 2px; }
   .chat > .scan-side .suggest button { padding: 5px 6px; font-size: 11px; }
 }

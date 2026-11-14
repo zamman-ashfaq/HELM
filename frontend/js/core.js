@@ -570,59 +570,43 @@
     { href: "index.html", id: "mission", label: "Mission Control", icon: "crosshair" },
     { href: "assessment.html", id: "assessment", label: "Health Assessment", icon: "clipboard" },
     { href: "analytics.html", id: "analytics", label: "Health Analytics", icon: "chart" },
-    { href: "assistant.html", id: "assistant", label: "AI Assistant", icon: "brain", tag: "LOCAL" },
-    { href: "scanning.html", id: "scanning", label: "Physical Scan", icon: "scan" },
+    { href: "assistant.html", id: "assistant", label: "AI Health Assistant", icon: "spark" },
+    { href: "scanning.html", id: "scanning", label: "Physical Assessment", icon: "scan" },
   ];
 
   function mountShell() {
     const shell = $(".shell");
     if (!shell) return;
     const page = shell.dataset.page || "mission";
-    const crumb = shell.dataset.crumb || "";
     const title = shell.dataset.title || "";
 
-    const sidebar = $(".sidebar");
-    if (sidebar) {
-      sidebar.innerHTML =
+    // Brand strip. On Mission Control it floats over the hero; elsewhere it sits
+    // above the page header band.
+    const head = $(".sitehead");
+    if (head) {
+      head.innerHTML =
         '<a class="brand" href="index.html">' +
           '<span class="brand-mark">' + icon("helm") + "</span>" +
           '<span class="brand-text"><b>HELM</b><span>Astronaut health</span></span>' +
         "</a>" +
-        '<nav class="nav" aria-label="Primary">' +
-          '<div class="nav-group">Crew systems</div>' +
-          NAV.map((n) =>
-            '<a class="nav-link' + (n.id === page ? " active" : "") + '" href="' + n.href + '"' +
-            (n.id === page ? ' aria-current="page"' : "") + ">" +
-              icon(n.icon) + '<span class="nav-label">' + n.label + "</span>" +
-              (n.tag ? '<span class="nav-tag">' + n.tag + "</span>" : "") +
-            "</a>"
-          ).join("") +
-        "</nav>" +
-        '<div class="side-foot">' +
-          '<div class="side-card"><b>Link status</b>' +
-            '<div class="dot-row"><span class="dot pulse" id="linkDot"></span><span id="linkText">Checking…</span></div>' +
-            '<div class="dot-row"><span class="dot" id="llmDot"></span><span id="llmText">Advisor idle</span></div>' +
-          "</div>" +
-          '<div class="side-card"><b>Offline record</b>' +
-            '<span id="offlineCount">0 check-ins stored</span>' +
-            '<div class="dot-row"><span class="dot" id="queueDot"></span><span id="queueText">Sync idle</span></div>' +
-          "</div>" +
-        "</div>";
+        '<span class="pill" id="pillDay">' + icon("clock") + "Mission day <b>--</b></span>" +
+        '<span class="pill" id="pillMode">' + icon("globe") + "<b>--</b></span>" +
+        '<span class="pill" id="pillLink">' + icon("offline") + "<span>Local record</span></span>" +
+        '<span class="spacer"></span>' +
+        '<a class="btn btn-sm btn-primary" href="assessment.html">' + icon("plus") + "New check-in</a>";
     }
 
-    const topbar = $(".topbar");
-    if (topbar) {
-      topbar.innerHTML =
-        '<div class="topbar-left">' +
-          '<span class="crumb">HELM <span class="sep">/</span> <b>' + esc(crumb || title) + "</b></span>" +
-        "</div>" +
-        '<div class="topbar-right">' +
-          '<span class="pill" id="pillDay">' + icon("clock") + 'Mission day <b>--</b></span>' +
-          '<span class="pill" id="pillMode">' + icon("globe") + '<b>--</b></span>' +
-          '<span class="pill" id="pillLink">' + icon("offline") + "<span>Local record</span></span>" +
-          '<a class="btn btn-sm btn-primary" href="assessment.html">' + icon("plus") + "New check-in</a>" +
-        "</div>";
+    // Primary navigation: five tabs under the hero.
+    const tabs = $(".tabbar");
+    if (tabs) {
+      tabs.innerHTML = '<div class="tabbar-inner">' + NAV.map((n) =>
+        '<a class="tab' + (n.id === page ? " active" : "") + '" href="' + n.href + '"' +
+        (n.id === page ? ' aria-current="page"' : "") + ">" +
+          icon(n.icon) + "<span>" + n.label + "</span>" +
+        "</a>"
+      ).join("") + "</div>";
     }
+
     document.title = (title ? title + " · " : "") + "HELM Astronaut Health";
   }
 

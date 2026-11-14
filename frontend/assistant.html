@@ -11,21 +11,26 @@
 <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
-<div class="shell" data-page="assistant" data-title="AI Assistant" data-crumb="AI Assistant">
-  <aside class="sidebar"></aside>
+<div class="shell" data-page="assistant" data-title="AI Health Assistant">
   <div class="main">
-    <header class="topbar"></header>
+    <header class="sitehead"></header>
 
     <main class="page">
-      <div class="panel-head rise" style="margin-bottom:0">
-        <div>
-          <span class="eyebrow">Onboard intelligence</span>
-          <h1 style="font-size:clamp(20px,1.9vw,26px);margin-top:6px">AI health assistant</h1>
-          <p class="muted small" style="margin-top:4px">Answers come from the crew's own local model, grounded in the knowledge files. If the model is not running, the rule-based advisor answers instead.</p>
+      <header class="pagehead">
+        <div class="wrap panel-head rise" style="margin-bottom:0">
+          <div>
+            <span class="eyebrow">Onboard intelligence</span>
+            <h1>AI health assistant</h1>
+            <p class="muted small" style="margin-top:5px">Answers come from the crew's own local model, grounded in the knowledge files. If the model is not running, the rule-based advisor answers instead.</p>
+          </div>
+          <span class="spacer"></span>
+          <span class="pill is-live" id="enginePill"></span>
         </div>
-        <span class="spacer"></span>
-        <span class="pill is-live" id="enginePill"></span>
-      </div>
+      </header>
+
+      <nav class="tabbar" aria-label="Primary"></nav>
+
+      <div class="wrap stack">
 
       <section class="chat">
         <div class="chat-shell">
@@ -74,12 +79,17 @@
       </section>
 
       <p class="small muted disclaimer" style="margin-top:14px" id="disclaimer"></p>
+      </div>
     </main>
 
     <footer class="foot">
       <span id="srcFoot">Advisor: local model</span>
       <span class="sep">|</span>
       <span>Not medical advice · wellness aid only</span>
+      <span class="foot-status">
+        <span class="dot-row"><span class="dot" id="llmDot"></span><span id="llmText">Advisor idle</span></span>
+        <span class="dot-row"><span class="dot" id="queueDot"></span><span id="offlineCount">0 check-ins stored</span><span class="sep">·</span><span id="queueText">Sync idle</span></span>
+      </span>
     </footer>
   </div>
 </div>

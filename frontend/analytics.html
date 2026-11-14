@@ -11,21 +11,26 @@
 <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
-<div class="shell" data-page="analytics" data-title="Health Analytics" data-crumb="Health Analytics">
-  <aside class="sidebar"></aside>
+<div class="shell" data-page="analytics" data-title="Health Analytics">
   <div class="main">
-    <header class="topbar"></header>
+    <header class="sitehead"></header>
 
     <main class="page">
-      <div class="panel-head rise" style="margin-bottom:0">
-        <div>
-          <span class="eyebrow">Scientific review</span>
-          <h1 style="font-size:clamp(20px,1.9vw,26px);margin-top:6px">Health analytics</h1>
-          <p class="muted small" style="margin-top:4px">Trends computed from the mission record. Missing measurements stay blank instead of being filled in.</p>
+      <header class="pagehead">
+        <div class="wrap panel-head rise" style="margin-bottom:0">
+          <div>
+            <span class="eyebrow">Scientific review</span>
+            <h1>Health analytics</h1>
+            <p class="muted small" style="margin-top:4px">Trends computed from the mission record. Missing measurements stay blank instead of being filled in.</p>
+          </div>
+          <span class="spacer"></span>
+          <div class="range-tabs" id="rangeTabs" role="group" aria-label="Time range"></div>
         </div>
-        <span class="spacer"></span>
-        <div class="range-tabs" id="rangeTabs" role="group" aria-label="Time range"></div>
-      </div>
+      </header>
+
+      <nav class="tabbar" aria-label="Primary"></nav>
+
+      <div class="wrap stack">
 
       <section class="ana-top">
         <div class="panel" id="wellPanel"></div>
@@ -35,12 +40,17 @@
       <section class="ana-grid" id="grid"></section>
 
       <section class="panel" id="recordPanel"></section>
+      </div>
     </main>
 
     <footer class="foot">
       <span id="srcFoot">Source: local mission record</span>
       <span class="sep">|</span>
       <span>Dashed lines are the band edges in <span class="mono">medical_thresholds.json</span>.</span>
+      <span class="foot-status">
+        <span class="dot-row"><span class="dot" id="llmDot"></span><span id="llmText">Advisor idle</span></span>
+        <span class="dot-row"><span class="dot" id="queueDot"></span><span id="offlineCount">0 check-ins stored</span><span class="sep">·</span><span id="queueText">Sync idle</span></span>
+      </span>
     </footer>
   </div>
 </div>
