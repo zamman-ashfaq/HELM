@@ -329,10 +329,21 @@
   min-height: 0;
 }
 /* The three side panels are taller than the chat on a 768 px laptop, so the
-   column scrolls inside itself instead of stretching the page. */
-.chat > .scan-side { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
-.chat > .scan-side > .panel { flex: none; padding: 13px 14px; }
-.chat > .scan-side .ctx-row { padding: 3px 0; font-size: 11.5px; }
+   column scrolls inside itself instead of stretching the page. The read-outs
+   are short label/value pairs, so they pair two per row and save the height. */
+.chat > .scan-side { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; gap: 10px; }
+.chat > .scan-side > .panel { flex: none; padding: 11px 14px; }
+.chat > .scan-side .context-card { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.chat > .scan-side .ctx-row {
+  flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px;
+  padding: 4px 8px; border: 1px solid var(--line); border-radius: 9px;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3);
+}
+.chat > .scan-side .suggest { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.chat > .scan-side .suggest button { text-align: center; }
+.chat > .scan-side .ctx-row:first-of-type { border-top: 1px solid var(--line); }
+.chat > .scan-side .ctx-row b { font-size: 12.5px; letter-spacing: 0; text-transform: none; }
 .chat-shell {
   display: flex; flex-direction: column; min-height: 0;
   border: 1px solid var(--line-hi);
@@ -582,6 +593,12 @@
 /* short viewports (1366×768 laptops) */
 @media (max-height: 800px) {
   .hero { min-height: 300px; }
-  .chat { height: clamp(400px, calc(100vh - 244px), 620px); }
+  /* No disclaimer and no subtitle on the assistant here: the chat bubble and the
+     engine badge already say the same thing, and the three side panels need
+     the room to stay whole. */
+  .chat { height: clamp(400px, calc(100vh - 208px), 620px); }
   .page > .disclaimer { display: none; }
+  .shell[data-page="assistant"] .page > .panel-head p.small { display: none; }
+  .shell[data-page="assistant"] .page > .panel-head h1 { margin-top: 2px; }
+  .chat > .scan-side .suggest button { padding: 5px 6px; font-size: 11px; }
 }

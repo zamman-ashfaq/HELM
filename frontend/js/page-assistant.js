@@ -17,11 +17,12 @@
     unavailable: { label: "UNAVAILABLE", badge: "is-warning", text: "Advisor module missing" },
   };
 
+  // `label` is the chip, `q` is what actually gets asked.
   const PROMPTS = [
-    "Give me an overall status summary.",
-    "Why is my heart rate flagged?",
-    "How has my sleep been this week?",
-    "What does my radiation dose mean?",
+    { label: "Status summary", q: "Give me an overall status summary." },
+    { label: "Heart rate flag", q: "Why is my heart rate flagged?" },
+    { label: "Sleep this week", q: "How has my sleep been this week?" },
+    { label: "Radiation dose", q: "What does my radiation dose mean?" },
   ];
 
   let busy = false;
@@ -64,7 +65,6 @@
 
   function renderContext() {
     const st = H.currentStatus();
-    const last = H.latest();
     const s = statusOf(st.worst);
     const i = st.indicators;
 
@@ -74,10 +74,10 @@
       return x ? num(x.value, dec) + ' <span class="muted">' + esc(x.unit || "") + "</span>" : '<span class="muted">--</span>';
     };
 
+    // Mission day and autonomy already have the greeting and the topbar, so the
+    // tiles carry the four vitals that travel with every question.
     $("#ctx").innerHTML =
-      row("Mission day", last.day == null ? "--" : "D" + last.day) +
       row("Wellness", st.wellness + " <span class=\"badge " + clsOf(s) + "\">" + s + "</span>") +
-      row("Autonomy", st.autonomy + "/100") +
       row("Heart rate", ind("heart_rate", 0)) +
       row("Blood pressure", i.blood_pressure_sys && i.blood_pressure_dia
         ? num(i.blood_pressure_sys.value, 0) + "/" + num(i.blood_pressure_dia.value, 0) + ' <span class="muted">mmHg</span>'
@@ -87,7 +87,7 @@
 
   function renderPrompts() {
     $("#suggest").innerHTML = PROMPTS.map((p) =>
-      '<button type="button" data-prompt="' + esc(p) + '">' + esc(p) + "</button>"
+      '<button type="button" data-prompt="' + esc(p.q) + '" title="' + esc(p.q) + '">' + esc(p.label) + "</button>"
     ).join("");
   }
 
