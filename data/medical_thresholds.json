@@ -1,0 +1,16 @@
+{
+  "indicators": {
+    "heart_rate":         { "label": "Heart rate", "unit": "bpm", "warning_low": 50, "warning_high": 100, "critical_low": 40, "critical_high": 130 },
+    "blood_pressure_sys": { "label": "Blood pressure (systolic)", "unit": "mmHg", "warning_low": 95, "warning_high": 135, "critical_low": 80, "critical_high": 160 },
+    "blood_pressure_dia": { "label": "Blood pressure (diastolic)", "unit": "mmHg", "warning_low": 60, "warning_high": 85, "critical_low": 50, "critical_high": 100 },
+    "temperature":        { "label": "Body temperature", "unit": "C", "warning_low": 35.5, "warning_high": 37.8, "critical_low": 34.5, "critical_high": 39.0 },
+    "blood_sugar":        { "label": "Blood sugar", "unit": "mg/dL", "warning_low": 70, "warning_high": 140, "critical_low": 54, "critical_high": 250 },
+    "sleep_hours":        { "label": "Sleep", "unit": "h", "warning_low": 6, "warning_high": null, "critical_low": 4, "critical_high": null },
+    "exercise_min":       { "label": "Exercise", "unit": "min", "warning_low": 60, "warning_high": null, "critical_low": 30, "critical_high": null },
+    "stress_score":       { "label": "Stress (0-100)", "unit": "", "warning_low": null, "warning_high": 60, "critical_low": null, "critical_high": 80 },
+    "radiation_total_msv":{ "label": "Radiation (cumulative)", "unit": "mSv", "warning_low": null, "warning_high": 100, "critical_low": null, "critical_high": 400 },
+    "radiation_event_msv":{ "label": "Radiation (single event)", "unit": "mSv", "warning_low": null, "warning_high": null, "critical_low": null, "critical_high": null },
+    "co2_mmhg":           { "label": "Cabin CO2", "unit": "mmHg", "warning_low": null, "warning_high": null, "critical_low": null, "critical_high": null },
+    "o2_partial_pressure_mmhg": { "label": "Cabin O2", "unit": "mmHg", "warning_low": null, "warning_high": null, "critical_low": null, "critical_high": null }
+  }
+}
