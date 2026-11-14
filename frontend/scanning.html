@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Physical Scan · HELM Astronaut Health</title>
+<meta name="description" content="Local movement capture and body-scan assessment. Runs on the device, with an optional MediaPipe pose model for landmark tracking.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23060b14'/%3E%3Cpath d='M12 3 5 6v6c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6l-7-3Z' fill='none' stroke='%2322d3ee' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="shell" data-page="scanning" data-title="Physical Scan" data-crumb="Physical Scan">
+  <aside class="sidebar"></aside>
+  <div class="main">
+    <header class="topbar"></header>
+
+    <main class="page">
+      <div class="panel-head rise" style="margin-bottom:0">
+        <div>
+          <span class="eyebrow">Computer vision · on device</span>
+          <h1 style="font-size:clamp(20px,1.9vw,26px);margin-top:6px">Physical assessment</h1>
+          <p class="muted small" style="margin-top:4px">Record a short movement sample. Everything is processed locally — the video never leaves this device.</p>
+        </div>
+        <span class="spacer"></span>
+        <span class="pill" id="modePill"></span>
+      </div>
+
+      <section class="scan-grid">
+        <div class="scan-main">
+          <div class="panel">
+            <div class="panel-head">
+              <div><span class="eyebrow">Capture</span><h3 style="margin-top:5px">Movement sample</h3></div>
+              <span class="spacer"></span>
+              <span class="badge is-nodata" id="stateBadge">NO SOURCE</span>
+            </div>
+
+            <div class="stage" id="stage">
+              <video id="vid" playsinline muted loop></video>
+              <canvas id="overlay" class="stage-canvas" width="640" height="360"></canvas>
+
+              <div class="placeholder drop" id="stageEmpty">
+                <span class="drop-icon" id="dropIcon"></span>
+                <b>Drop a movement video here</b>
+                <span>MP4, WebM or MOV · processed in this browser tab, never uploaded</span>
+                <span class="chips" style="justify-content:center">
+                  <button class="btn btn-sm" type="button" id="pickBtn"></button>
+                  <button class="btn btn-sm btn-ghost" type="button" id="camBtn"></button>
+                </span>
+              </div>
+
+              <div class="scanbar" id="scanbar" hidden></div>
+              <div class="vignette"></div>
+              <div class="hud-tl" id="hudTl">STANDBY</div>
+              <div class="hud-tr" id="hudTr">NO SOURCE</div>
+              <div class="hud-bl" id="hudBl">0.0 s</div>
+            </div>
+
+            <div class="scan-controls">
+              <input type="file" id="file" accept="video/*" hidden>
+              <button class="btn btn-primary" id="scanBtn" type="button" disabled></button>
+              <button class="btn" id="uploadBtn" type="button"></button>
+              <button class="btn" id="cameraBtn" type="button"></button>
+              <button class="btn btn-ghost" id="resetBtn" type="button"></button>
+              <span class="grow"></span>
+              <span class="small muted" id="progressText">No source loaded</span>
+            </div>
+            <div class="meter" style="margin-top:10px"><i id="prog" style="width:0%"></i></div>
+          </div>
+
+          <div class="panel" id="resultsPanel"></div>
+        </div>
+
+        <div class="scan-side">
+          <div class="panel" id="modelPanel"></div>
+          <div class="panel" id="selfPanel"></div>
+          <div class="panel" id="protocolPanel"></div>
+        </div>
+      </section>
+
+      <p class="small muted" style="margin-top:14px">
+        Fatigue and mobility signals here are screening aids built from movement, sleep and self-report.
+        Video alone cannot diagnose a condition, and nothing on this page is a medical result.
+      </p>
+    </main>
+
+    <footer class="foot">
+      <span id="srcFoot">Vision: local</span>
+      <span class="sep">|</span>
+      <span>Video stays on the device · no upload, no cloud inference</span>
+    </footer>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/vision.js"></script>
+<script src="js/page-scanning.js"></script>
+</body>
+</html>

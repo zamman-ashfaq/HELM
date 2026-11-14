@@ -5,3 +5,9 @@ _pycache_/
 *.db
 node_modules/
 .DS_Store
+
+# local verification artefacts (screenshots, headless profiles, api scripts)
+shots/
+.edge-tmp/
+screenshot_*.png
+mission_control_*.png

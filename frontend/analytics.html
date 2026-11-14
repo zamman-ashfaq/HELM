@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Health Analytics · HELM Astronaut Health</title>
+<meta name="description" content="Historical astronaut health analytics: heart rate, blood pressure, oxygen saturation, sleep, radiation and wellness progression.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23060b14'/%3E%3Cpath d='M12 3 5 6v6c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6l-7-3Z' fill='none' stroke='%2322d3ee' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="shell" data-page="analytics" data-title="Health Analytics" data-crumb="Health Analytics">
+  <aside class="sidebar"></aside>
+  <div class="main">
+    <header class="topbar"></header>
+
+    <main class="page">
+      <div class="panel-head rise" style="margin-bottom:0">
+        <div>
+          <span class="eyebrow">Scientific review</span>
+          <h1 style="font-size:clamp(20px,1.9vw,26px);margin-top:6px">Health analytics</h1>
+          <p class="muted small" style="margin-top:4px">Trends computed from the mission record. Missing measurements stay blank instead of being filled in.</p>
+        </div>
+        <span class="spacer"></span>
+        <div class="range-tabs" id="rangeTabs" role="group" aria-label="Time range"></div>
+      </div>
+
+      <section class="ana-top">
+        <div class="panel" id="wellPanel"></div>
+        <div class="panel" id="changePanel"></div>
+      </section>
+
+      <section class="ana-grid" id="grid"></section>
+
+      <section class="panel" id="recordPanel"></section>
+    </main>
+
+    <footer class="foot">
+      <span id="srcFoot">Source: local mission record</span>
+      <span class="sep">|</span>
+      <span>Dashed lines are the band edges in <span class="mono">medical_thresholds.json</span>.</span>
+    </footer>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/page-analytics.js"></script>
+</body>
+</html>

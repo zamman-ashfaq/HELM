@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>AI Assistant · HELM Astronaut Health</title>
+<meta name="description" content="Local astronaut health assistant. Questions about measurements, history and recommendations answered by the onboard model with an offline rule-based fallback.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23060b14'/%3E%3Cpath d='M12 3 5 6v6c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6l-7-3Z' fill='none' stroke='%2322d3ee' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="shell" data-page="assistant" data-title="AI Assistant" data-crumb="AI Assistant">
+  <aside class="sidebar"></aside>
+  <div class="main">
+    <header class="topbar"></header>
+
+    <main class="page">
+      <div class="panel-head rise" style="margin-bottom:0">
+        <div>
+          <span class="eyebrow">Onboard intelligence</span>
+          <h1 style="font-size:clamp(20px,1.9vw,26px);margin-top:6px">AI health assistant</h1>
+          <p class="muted small" style="margin-top:4px">Answers come from the crew's own local model, grounded in the knowledge files. If the model is not running, the rule-based advisor answers instead.</p>
+        </div>
+        <span class="spacer"></span>
+        <span class="pill is-live" id="enginePill"></span>
+      </div>
+
+      <section class="chat">
+        <div class="chat-shell">
+          <div class="chat-top">
+            <span class="chat-avatar" id="chatAvatar"></span>
+            <span class="chat-id"><b>HELM Advisor</b><span id="chatSub">Connecting…</span></span>
+            <span class="spacer"></span>
+            <span class="badge is-nodata" id="srcBadge">IDLE</span>
+            <button class="btn btn-sm btn-ghost" id="resetBtn" type="button" title="Clear this session"></button>
+          </div>
+
+          <div class="chat-log" id="log" role="log" aria-live="polite" aria-label="Conversation"></div>
+
+          <div class="composer">
+            <div class="composer-row">
+              <textarea id="input" rows="1" placeholder="Ask about a reading, a trend, or what to do next…" aria-label="Your question"></textarea>
+              <button class="mic" id="micBtn" type="button" title="Voice input" aria-label="Start voice input"></button>
+              <button class="btn btn-primary" id="sendBtn" type="button" aria-label="Send"></button>
+            </div>
+            <div class="composer-hint">
+              <span class="transcript" id="transcript"></span>
+              <span class="grow"></span>
+              <span class="kbd-hint">Enter to send · Shift+Enter for a new line</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scan-side">
+          <div class="panel">
+            <div class="panel-head"><div><span class="eyebrow">Try asking</span><h3 style="margin-top:5px">Prompts</h3></div></div>
+            <div class="suggest" id="suggest"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div><span class="eyebrow">Sent with each question</span><h3 style="margin-top:5px">Live context</h3></div></div>
+            <div class="context-card" id="ctx"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div><span class="eyebrow">Audio</span><h3 style="margin-top:5px">Voice</h3></div><span class="spacer"></span>
+              <button class="btn btn-sm btn-ghost" id="voiceToggle" type="button"></button>
+            </div>
+            <div class="context-card" id="voiceState"></div>
+            <p class="small muted" style="margin-top:10px">Replies are spoken by the operating system's own voice engine on this device. Speech-to-text uses the browser's recogniser, which may need a connection on some systems — typing always works offline.</p>
+          </div>
+        </div>
+      </section>
+
+      <p class="small muted disclaimer" style="margin-top:14px" id="disclaimer"></p>
+    </main>
+
+    <footer class="foot">
+      <span id="srcFoot">Advisor: local model</span>
+      <span class="sep">|</span>
+      <span>Not medical advice · wellness aid only</span>
+    </footer>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/advisor-local.js"></script>
+<script src="js/page-assistant.js"></script>
+</body>
+</html>
