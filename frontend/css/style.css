@@ -50,6 +50,7 @@ main{max-width:1080px;margin:0 auto;padding:20px}
 .checkin label{display:flex;flex-direction:column;font-size:13px;color:var(--muted)}
 .checkin input{background:var(--bg);border:1px solid var(--edge);color:var(--text);border-radius:6px;padding:6px 8px}
 .checkin .go{grid-column:1/-1;justify-self:start;background:var(--acc);color:#07202e;font-weight:600}
+.detail h3{margin:14px 0 4px;font-size:14px;color:var(--muted)}
 footer{max-width:1080px;margin:10px auto 30px;padding:0 20px;color:var(--muted);font-size:13px}
 @media(max-width:640px){.hero{grid-template-columns:1fr;justify-items:center}.row{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

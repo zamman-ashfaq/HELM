@@ -6,7 +6,14 @@ const SYSTEMS={
  life_support:{label:'Life support',body:'Heart and circulation',keys:['heart_rate','blood_pressure_sys','blood_pressure_dia','co2_mmhg','o2_partial_pressure_mmhg'],why:'Weightlessness alters blood circulation and how the heart and blood vessels work. Low oxygen and high carbon dioxide are also flagged risks.',src:'NASA HRP: Cardiovascular Adaptations; Hypoxia'},
  shielding:{label:'Shielding',body:'Immune system and radiation',keys:['radiation_total_msv','radiation_event_msv','temperature'],why:'Spaceflight stress can awaken dormant viruses and change microbiomes. Radiation adds up over the whole mission, and neutrons are about 30% of radiation on the ISS.',src:'NASA HRP: Altered Immune System Responses; Host-Microorganism Interactions; CSA: Monitoring Radiation for Astronaut Health'},
  power:{label:'Power',body:'Metabolism and nutrition',keys:['blood_sugar'],why:'A healthy, balanced diet is essential to crew health and performance on long missions.',src:'NASA HRP: Inadequate Food and Nutrition'},
+ 
  flight_computer:{label:'Flight computer',body:'Sleep, stress and mood',keys:['sleep_hours','stress_score'],why:'Isolation, confinement and disrupted light cycles affect sleep and behavioral health. NASA tracks sleep and activity with wearables on Artemis II.',src:'NASA HRP: Sensorimotor and Vestibular Function; ARCHeR study; CSA: Preparing for deep-space destinations'}};
+ const ACTIONS={
+ structure:['Complete your scheduled exercise session today.','If short on time, shorten the session rather than skipping it.','Report new pain or weakness at your next contact with the flight surgeon.'],
+ life_support:['Stop strenuous activity and rest, then re-check.','Check cabin air readouts if breathing feels harder than usual.','Report persistent changes to the flight surgeon.'],
+ shielding:['Rest and re-check temperature after a while.','If you have a fever, limit close contact with crewmates as your protocol directs.','Stay hydrated as your protocol advises, and report to the flight surgeon.'],
+ power:['Eat your scheduled meals even if appetite is low.','Log intake so trends are visible.','Report sustained appetite loss to the flight surgeon.'],
+ flight_computer:['Protect a consistent sleep window and keep the cabin calm before it.','Talk to crewmates or Earth support about mood.','Report any vision change promptly.']};
 const CUM=['radiation_total_msv','radiation_event_msv'];
 const MODES={iss:{label:'ISS',km:400},moon:{label:'Moon',km:384400},mars:{label:'Mars',km:225e6}};
 const SYM={NOMINAL:'\u2713',CAUTION:'\u25B2',WARNING:'\u25A0','NO DATA':'\u2013'};
@@ -54,7 +61,7 @@ function render(){
  if(open){const S=SYSTEMS[open];const rows=S.keys.filter(k=>c.ind[k]).map(k=>{const x=c.ind[k],t=st(x.s),vals=R.slice(0,i+1).map(q=>q[k]);
   const drift=CUM.includes(k)?'adds up over the mission':x.d==null?'no baseline':`${x.d>0?'+':''}${num(x.d)}% from your baseline`;
   return`<div class="row ${cls(t)}"><span>${T[k].label}</span><span>${num(x.v)} ${T[k].unit||''}</span><span>${drift}</span><span class="badge">${SYM[t]} ${t}</span>${spark(vals,110,24)}</div>`}).join('');
-  detail=`<section class="detail"><h2>${S.label}: ${S.body}</h2><p class="why">${S.why}</p>${rows||'<p class="note">No readings for this system yet. Add a check-in below.</p>'}<p class="note">Source: ${S.src}. Follow your mission medical protocol for treatment.</p></section>`}
+ detail=`<section class="detail"><h2>${S.label}: ${S.body}</h2><p class="why">${S.why}</p>${rows||'<p class="note">No readings for this system yet. Add a check-in below.</p>'}<h3>What to do</h3><ul>${ACTIONS[ open ].map(a=>`<li>${a}</li>`).join('')}</ul><p class="note">Source: ${S.src}. Follow your mission medical protocol for treatment.</p></section>`}
  const keys=[...new Set(Object.values(SYSTEMS).flatMap(s=>s.keys))].filter(k=>T[k]);
  const form=keys.map(k=>`<label>${T[k].label}${T[k].unit?' ('+T[k].unit+')':''}<input type="number" step="any" name="${k}"></label>`).join('');
  $('#app').innerHTML=`
