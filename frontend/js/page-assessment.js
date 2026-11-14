@@ -122,7 +122,7 @@
           '<div class="form-grid">' + env + "</div></div>" : "") +
         (c.id === "musculo" ? '<div class="form-section"><div class="form-section-title">' + icon("scan") + 'Movement scan</div>' +
           '<p class="small muted">The physical assessment page records a movement sample and derives a mobility index from it when a local pose model is installed. That index is shown there and kept with the scan, not re-scored here.</p>' +
-          '<a class="btn btn-sm btn-ghost" href="scanning.html" style="margin-top:8px">' + icon("scan") + "Open physical scan</a></div>" : "") +
+          '<a class="btn btn-sm btn-ghost" href="physical.html" style="margin-top:8px">' + icon("scan") + "Open physical scan</a></div>" : "") +
         (missing ? '<div class="form-section"><div class="form-section-title">' + icon("lock") + "Not instrumented yet</div>" +
           '<div style="display:flex;flex-direction:column;gap:8px">' + missing + "</div></div>" : "") +
       "</section>"
@@ -336,7 +336,7 @@
             (first ? "?q=" + encodeURIComponent("Why is my " + status.indicators[first].label + " flagged?") : "") + '">' +
             icon("brain") + "Explain this with the AI assistant</a>" +
           '<a class="btn btn-sm btn-ghost" href="analytics.html">' + icon("chart") + "Compare with history</a>" +
-          '<a class="btn btn-sm btn-ghost" href="scanning.html">' + icon("scan") + "Run a movement scan</a>" +
+          '<a class="btn btn-sm btn-ghost" href="physical.html">' + icon("scan") + "Run a movement scan</a>"
         "</div>" +
       "</div>";
 

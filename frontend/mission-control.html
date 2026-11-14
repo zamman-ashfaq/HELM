@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Mission Control · HELM Astronaut Health</title>
+<meta name="description" content="HELM — astronaut health monitoring system. Mission control overview for crew vitals, wellness score and system status.">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="shell" data-page="mission" data-title="Mission Control">
+  <header class="site-nav" data-nav></header>
+
+  <main class="page">
+    <header class="pagehead">
+      <div class="wrap panel-head rise" style="margin-bottom:0">
+        <div>
+          <span class="eyebrow">Mission control</span>
+          <h1>Mission overview</h1>
+          <p class="muted small" style="margin-top:4px">Live vitals, wellness and the five health domains for the selected mission day.</p>
+        </div>
+        <span class="spacer"></span>
+        <a class="btn btn-sm btn-primary" href="assessment.html">New check-in</a>
+      </div>
+    </header>
+
+    <div class="wrap stack">
+
+      <section class="chips" id="missionChips" aria-label="Mission context"></section>
+
+      <!-- Day scrubber + flight profile: the distance profile drives the signal
+           delay and the autonomy advice further down the page. -->
+      <div class="mission-bar">
+        <section class="daybar" id="daybar" aria-label="Mission day selection"></section>
+
+        <div class="flight-switch">
+          <div class="switch-group">
+            <span class="label">Flight profile</span>
+            <div class="range-tabs" role="group" aria-label="Flight profile">
+              <button type="button" data-mode="iss" aria-pressed="false">ISS / LEO</button>
+              <button type="button" data-mode="moon" aria-pressed="false">Lunar</button>
+              <button type="button" data-mode="mars" aria-pressed="true" class="on">Mars transit</button>
+            </div>
+          </div>
+          <div class="switch-group">
+            <span class="label">Signal to Earth</span>
+            <span class="pill" id="pillMode"></span>
+          </div>
+        </div>
+      </div>
+
+      <section class="status-rail" id="vitals" aria-label="Current vitals"></section>
+
+      <section class="split">
+        <div class="panel" id="wellnessPanel" aria-live="polite"></div>
+        <div class="panel" id="advicePanel"></div>
+      </section>
+
+      <section aria-labelledby="catHeading">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Category overview</span>
+            <h2 id="catHeading" style="margin-top:6px;font-size:16px">Five health domains</h2>
+          </div>
+          <span class="spacer"></span>
+          <a class="btn btn-sm btn-ghost" href="analytics.html">Open analytics</a>
+        </div>
+        <div class="grid g-5" id="cats"></div>
+      </section>
+
+      <section class="split-even">
+        <div class="panel" id="trendPanel"></div>
+        <div class="panel" id="feedPanel"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>HELM decision-support prototype · simulated crew data</span>
+    <span class="sep">|</span>
+    <span>Not a medical device. Radiation, CO2, oxygen, sleep and exercise bands are team choices anchored on NASA numbers (see <span class="mono">knowledge/</span>).</span>
+    <span class="foot-status">
+      <span class="dot-row"><span class="dot" id="llmDot"></span><span id="llmText">Advisor idle</span></span>
+      <span class="dot-row"><span class="dot" id="queueDot"></span><span id="offlineCount">0 check-ins stored</span><span class="sep">·</span><span id="queueText">Sync idle</span></span>
+    </span>
+  </footer>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/page-mission.js"></script>
+</body>
+</html>

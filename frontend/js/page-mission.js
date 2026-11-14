@@ -47,24 +47,15 @@
   function renderChips(st, cur) {
     const mode = H.state.mode;
     const m = MODES[mode];
-    const host = $("#heroChips");
+    const host = $("#missionChips");
+    if (!host) return;
     host.innerHTML =
       chip("Crew", "B") +
       chip("Astronaut", H.DEMO.astronaut) +
       chip("Mission day", cur.day != null ? cur.day : "--") +
       chip(m.note, Math.round(m.km / 1e6) + " M km") +
       chip("Signal", fmtDelay(H.delaySeconds(m.km)) + " one way") +
-      '<div class="range-tabs" role="group" aria-label="Flight profile">' +
-        Object.keys(MODES).map((k) =>
-          '<button type="button" data-mode="' + k + '" class="' + (k === mode ? "on" : "") + '" aria-pressed="' + (k === mode) + '">' + MODES[k].label + "</button>"
-        ).join("") +
-      "</div>";
-
-    const tag = $("#heroTag");
-    if (tag) {
-      const s = statusOf(st.worst);
-      tag.innerHTML = "<span>Internal view · US Lab</span><b>CREW STATUS · " + esc(s) + "</b>";
-    }
+      chip("Crew status", statusOf(st.worst));
   }
 
   function sparkFor(t, key, n) {
@@ -337,6 +328,14 @@
     }
   }
 
+  // The day you leave the scrubber on follows you to the other pages.
+  function restoreView(t) {
+    const day = H.session.get("day", null);
+    if (day == null) return null;
+    for (let i = 0; i < t.length; i++) if (t[i].day === day) return i;
+    return null;
+  }
+
   function renderAll() {
     const t = H.timeline();
     if (!t.length) return;
@@ -344,6 +343,7 @@
     view = clampIndex(view, t.length);
 
     const cur = t[view];
+    H.session.set("day", cur.day == null ? null : cur.day);
     const past = t.slice(0, view + 1);
     const st = H.compute(Object.assign({}, cur, { distance_from_earth_km: MODES[H.state.mode].km }), H.BASE);
 
@@ -355,15 +355,12 @@
     renderCats(st, past);
     renderTrend(st, past);
     renderFeed(past);
-
-    // keep the top bar honest about which day is on screen
-    const pd = document.getElementById("pillDay");
-    if (pd) pd.innerHTML = icon("clock") + "Mission day <b>" + (cur.day == null ? "--" : cur.day) + "</b>";
   }
 
   H.ready(() => {
     H.boot(() => {
       mountDaybar();
+      view = restoreView(H.timeline());
       renderAll();
       H.on((what) => {
         if (what === "mode" || what === "data" || what === "sync") renderAll();

@@ -276,6 +276,22 @@
   };
 
   /* ------------------------------------------------------------------ state */
+  // Session memory: the mission day and flight profile survive a page change but
+  // not a closed tab. Blocked storage (private mode) falls back to the defaults.
+  const session = {
+    get(key, fallback) {
+      try {
+        const raw = sessionStorage.getItem(CFG.storagePrefix + key);
+        return raw == null ? fallback : JSON.parse(raw);
+      } catch (e) {
+        return fallback;
+      }
+    },
+    set(key, value) {
+      try { sessionStorage.setItem(CFG.storagePrefix + key, JSON.stringify(value)); } catch (e) {}
+    },
+  };
+
   let THRESHOLDS = {};
   let DEMO = { astronaut: "Crew member", readings: [] };
   let LOCAL = [];          // locally saved check-ins (offline record)
@@ -566,58 +582,33 @@
   }
 
   /* ----------------------------------------------------------------- shell */
-  const NAV = [
-    { href: "index.html", id: "mission", label: "Mission Control", icon: "crosshair" },
-    { href: "assessment.html", id: "assessment", label: "Health Assessment", icon: "clipboard" },
-    { href: "analytics.html", id: "analytics", label: "Health Analytics", icon: "chart" },
-    { href: "assistant.html", id: "assistant", label: "AI Health Assistant", icon: "spark" },
-    { href: "scanning.html", id: "scanning", label: "Physical Assessment", icon: "scan" },
-  ];
-
+  // The navigation bar is injected by js/nav.js, so every page shares exactly one
+  // copy of it. The shell only owns the document title and the mode buttons.
   function mountShell() {
     const shell = $(".shell");
     if (!shell) return;
-    const page = shell.dataset.page || "mission";
     const title = shell.dataset.title || "";
+    document.title = (title ? title + " \u00b7 " : "") + "HELM Astronaut Health";
+    syncModeButtons();
+  }
 
-    // Brand strip. On Mission Control it floats over the hero; elsewhere it sits
-    // above the page header band.
-    const head = $(".sitehead");
-    if (head) {
-      head.innerHTML =
-        '<a class="brand" href="index.html">' +
-          '<span class="brand-mark">' + icon("helm") + "</span>" +
-          '<span class="brand-text"><b>HELM</b><span>Astronaut health</span></span>' +
-        "</a>" +
-        '<span class="pill" id="pillDay">' + icon("clock") + "Mission day <b>--</b></span>" +
-        '<span class="pill" id="pillMode">' + icon("globe") + "<b>--</b></span>" +
-        '<span class="pill" id="pillLink">' + icon("offline") + "<span>Local record</span></span>" +
-        '<span class="spacer"></span>' +
-        '<a class="btn btn-sm btn-primary" href="assessment.html">' + icon("plus") + "New check-in</a>";
-    }
-
-    // Primary navigation: five tabs under the hero.
-    const tabs = $(".tabbar");
-    if (tabs) {
-      tabs.innerHTML = '<div class="tabbar-inner">' + NAV.map((n) =>
-        '<a class="tab' + (n.id === page ? " active" : "") + '" href="' + n.href + '"' +
-        (n.id === page ? ' aria-current="page"' : "") + ">" +
-          icon(n.icon) + "<span>" + n.label + "</span>" +
-        "</a>"
-      ).join("") + "</div>";
-    }
-
-    document.title = (title ? title + " · " : "") + "HELM Astronaut Health";
+  // The flight-profile switch lives in static markup; bring it in line with the
+  // stored profile on load and keep the pressed state honest after a change.
+  function syncModeButtons() {
+    $$("[data-mode]").forEach((b) => {
+      const on = b.dataset.mode === state.mode;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
   }
 
   function paintShell() {
     const linkDot = $("#linkDot"), linkText = $("#linkText");
     const llmDot = $("#llmDot"), llmText = $("#llmText");
     const offCount = $("#offlineCount"), qDot = $("#queueDot"), qText = $("#queueText");
-    const pillDay = $("#pillDay"), pillMode = $("#pillMode"), pillLink = $("#pillLink");
+    const pillMode = $("#pillMode"), pillLink = $("#pillLink");
 
     const st = currentStatus();
-    const day = latest().day;
     const offline = !state.online;
 
     if (linkDot) {
@@ -633,7 +624,6 @@
     if (qDot) qDot.style.color = queue.length ? "var(--warn)" : "var(--ok)";
     if (qText) qText.textContent = queue.length ? queue.length + " waiting to sync" : (state.lastSync ? "Synced " + fmtDate(state.lastSync) : "Nothing queued");
 
-    if (pillDay) pillDay.innerHTML = icon("clock") + "Mission day <b>" + (day == null ? "--" : day) + "</b>";
     if (pillMode) {
       const m = MODES[state.mode] || MODES.mars;
       pillMode.innerHTML = icon("globe") + "<b>" + m.label + "</b> · " + fmtDelay(delaySeconds(m.km));
@@ -656,7 +646,7 @@
   /* ------------------------------------------------------------------ boot */
   async function boot(render) {
     loadLocal();
-    state.mode = store.get("mode", DEMO_MODE_DEFAULT());
+    state.mode = session.get("mode", store.get("mode", DEMO_MODE_DEFAULT()));
     mountShell();
 
     try {
@@ -703,7 +693,8 @@
       if (modeBtn) {
         state.mode = modeBtn.dataset.mode;
         store.set("mode", state.mode);
-        $$("[data-mode]").forEach((b) => b.classList.toggle("on", b.dataset.mode === state.mode));
+        session.set("mode", state.mode);
+        syncModeButtons();
         paintShell();
         emit("mode");
       }
@@ -718,7 +709,7 @@
 
   /* --------------------------------------------------------------- exports */
   window.HELM = {
-    CFG, ICON, icon, SYS, CATEGORIES, MODES, store, state, api,
+    CFG, ICON, icon, SYS, CATEGORIES, MODES, store, session, state, api,
     $, $$, esc, num, clamp, round, statusOf, clsOf, labelOf, fmtDelay, fmtDate, daysAgo,
     compute, currentStatus, latest, timeline, withMode, dayLabel, baselines,
     systemOf: (k) => systemOf(k),
