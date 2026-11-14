@@ -36,10 +36,10 @@ NOT_COVERED = "That isn't covered in my notes, so I can't answer it reliably. " 
 # Copy of the system -> indicators map in score.py (keep in sync if the logic lead changes it).
 SYSTEM_INDICATORS = {
     "structure":       ["exercise_min"],
-    "life_support":    ["heart_rate", "blood_pressure_sys", "blood_pressure_dia", "co2_mmhg", "o2_partial_pressure_mmhg"],
+    "life_support":    ["heart_rate", "blood_pressure_sys", "blood_pressure_dia", "spo2", "co2_mmhg", "o2_partial_pressure_mmhg"],
     "shielding":       ["radiation_total_msv", "radiation_event_msv", "temperature"],
     "power":           ["blood_sugar"],
-    "flight_computer": ["sleep_hours", "stress_score"],
+    "flight_computer": ["sleep_hours", "stress_score", "mood_score", "fatigue_score"],
 }
 
 # Words in a question -> which indicator it is about.
@@ -56,6 +56,9 @@ KEYWORDS = {
     "blood_sugar":              ["blood sugar", "glucose", "sugar", "food", "energy"],
     "sleep_hours":              ["sleep", "insomnia", "rest", "tired", "fatigue"],
     "stress_score":             ["stress", "anxiety", "mood", "calm"],
+    "spo2":                     ["oxygen saturation", "spo2", "saturation", "breathing"],
+    "mood_score":               ["mood", "moral", "motivation", "down", "low"],
+    "fatigue_score":            ["fatigue", "exhausted", "worn out", "energy"],
 }
 SYSTEM_KEYWORDS = {
     "structure": ["structure"], "life_support": ["life support"], "shielding": ["shielding"],
@@ -69,9 +72,12 @@ GENERIC_WORDS = ["wellness", "health", "status", "advice", "advise", "recommend"
 # (e.g. knowledge/sleep.md is found for sleep_hours). Edit to match the research lead's file names.
 NOTE_ALIASES = {
     "o2_partial_pressure_mmhg": ["oxygen"],
+    "spo2": ["oxygen"],
     "co2_mmhg": ["carbon_dioxide"],
     "blood_sugar": ["glucose", "nutrition"],
     "stress_score": ["psych", "mental"],
+    "mood_score": ["mental", "stress"],
+    "fatigue_score": ["sleep", "fatigue"],
 }
 
 # ---------- rule-based fallback (research lead: replace with the 'actions' column of the indicator table) ----------
@@ -88,6 +94,9 @@ FALLBACK_ACTIONS = {
     "blood_sugar":              "Eat a balanced meal at a regular time and drink water.",
     "sleep_hours":              "Protect a fixed sleep window, dim lights before bed, and avoid screens late.",
     "stress_score":             "Try 5 minutes of slow breathing, take a short break, and talk to the crew or ground.",
+    "spo2":                     "Sit still, breathe normally and re-check the sensor; report a persistent drop to the crew medical officer.",
+    "mood_score":               "Schedule a call with crew or family, keep your daily routine, and tell the commander how you feel.",
+    "fatigue_score":            "Shorten today's strenuous tasks, hydrate, and protect the next sleep window.",
 }
 
 DEFAULT_SYSTEM_PROMPT = """You are a spacecraft wellness advisor.
@@ -232,6 +241,15 @@ def _compact_status(status, keys):
         "indicators": {k: {f: ind[k].get(f) for f in ("label", "value", "unit", "score", "status")}
                        for k in keys if k in ind},
     }
+
+
+def ping(timeout=2.0):
+    """True when the local Ollama server answers. Used by GET /api/health."""
+    try:
+        with urllib.request.urlopen(OLLAMA_URL.rsplit("/", 1)[0] + "/tags", timeout=timeout) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
 
 
 # ---------- the one function everyone calls ----------
