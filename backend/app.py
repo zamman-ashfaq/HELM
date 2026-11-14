@@ -1,10 +1,15 @@
+import sys
+import sqlite3
+from pathlib import Path
+from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional
-import sqlite3
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import score
 
+DB = str(Path(__file__).resolve().parent / "helm_offline.db")
 app = FastAPI(title="HELM Backend API")
 
 app.add_middleware(
@@ -14,14 +19,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 def init_db():
-    conn = sqlite3.connect("helm_offline.db")
-    cursor = conn.cursor()
-    # Updated schema to include the Research Lead's new metrics
-    cursor.execute('''
+    conn = sqlite3.connect(DB)
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS checkins (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             astronaut_id TEXT,
             heart_rate REAL,
             blood_pressure_sys REAL,
@@ -39,10 +42,7 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-
 init_db()
-
-# Updated Payload to match the new medical_thresholds.json keys
 class CheckInPayload(BaseModel):
     astronaut_id: str
     heart_rate: Optional[float] = None
@@ -58,40 +58,26 @@ class CheckInPayload(BaseModel):
 
 @app.get("/api/status")
 def get_status():
-    conn = sqlite3.connect("helm_offline.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT wellness_score, autonomy_level FROM checkins ORDER BY id DESC LIMIT 1")
-    result = cursor.fetchone()
+    conn = sqlite3.connect(DB)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute("SELECT * FROM checkins ORDER BY id DESC LIMIT 1").fetchone()
     conn.close()
-    
-    if result:
-        return {"status": "nominal", "overall_wellness": result[0], "autonomy_meter": result[1]}
-    return {"status": "no data", "overall_wellness": 100, "autonomy_meter": 0}
-
+    if not row:
+        return {"status": "NO DATA"}
+    skip = {"id", "astronaut_id", "wellness_score", "autonomy_level", "created_at"}
+    vitals = {k: row[k] for k in row.keys() if k not in skip and row[k] is not None}
+    return score.compute(vitals)
 @app.post("/api/checkin")
 def process_checkin(payload: CheckInPayload):
-    vitals = payload.model_dump(exclude_none=True) 
-    
-    wellness, autonomy = score.calculate_wellness(vitals)
-    
-    conn = sqlite3.connect("helm_offline.db")
-    cursor = conn.cursor()
-    
-    # Dynamically build the insert query based on what vitals were provided
+    vitals = payload.model_dump(exclude_none=True)
+    result = score.compute(vitals)
     columns = list(vitals.keys()) + ["wellness_score", "autonomy_level"]
-    values = list(vitals.values()) + [wellness, autonomy]
-    placeholders = ",".join(["?"] * len(values))
-    
-    cursor.execute(f'''
-        INSERT INTO checkins ({",".join(columns)}) 
-        VALUES ({placeholders})
-    ''', values)
-    
+    values = list(vitals.values()) + [result["wellness"], result["autonomy"]]
+    conn = sqlite3.connect(DB)
+    conn.execute(
+        f"INSERT INTO checkins ({','.join(columns)}) VALUES ({','.join('?' * len(values))})",
+        values,
+    )
     conn.commit()
     conn.close()
-    
-    return {
-        "status": "success",
-        "saved_wellness_score": wellness,
-        "saved_autonomy_level": autonomy
-    }
+    return {"status": "success", **result}
