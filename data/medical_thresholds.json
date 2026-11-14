@@ -132,6 +132,39 @@
       "basis": "nasa",
       "source": "ISS cabin design range 19.5 to 23.1 kPa (NASA NTRS 20120015343). The 1 kPa yellow margin is a team choice. The key name says mmhg but the unit is kPa.",
       "verified": true
+    },
+    "spo2": {
+      "label": "Oxygen saturation (SpO2)",
+      "unit": "%",
+      "warning_low": 94,
+      "warning_high": null,
+      "critical_low": 90,
+      "critical_high": null,
+      "basis": "clinical",
+      "source": "General clinical pulse-oximetry ranges (yellow under 94 percent, red under 90 percent). Not a NASA limit and not verified against a NASA source.",
+      "verified": false
+    },
+    "mood_score": {
+      "label": "Mood (0-100, higher is better)",
+      "unit": "",
+      "warning_low": 50,
+      "warning_high": null,
+      "critical_low": 30,
+      "critical_high": null,
+      "basis": "app",
+      "source": "Team-defined self-report scale. NASA uses POMS and BDI-II; HELM keeps a single 0-100 slider for speed.",
+      "verified": false
+    },
+    "fatigue_score": {
+      "label": "Fatigue (0-100, lower is better)",
+      "unit": "",
+      "warning_low": null,
+      "warning_high": 60,
+      "critical_low": null,
+      "critical_high": 80,
+      "basis": "app",
+      "source": "Team-defined self-report scale. Also used as one input to the movement-based fatigue indicator on the physical assessment page.",
+      "verified": false
     }
   }
 }

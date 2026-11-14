@@ -16,10 +16,10 @@ LIGHT_KM_PER_S = 299_792.458
 
 SYSTEMS = {
     "structure":       {"label": "Structure",       "indicators": ["exercise_min"]},
-    "life_support":    {"label": "Life support",    "indicators": ["heart_rate", "blood_pressure_sys", "blood_pressure_dia", "co2_mmhg", "o2_partial_pressure_mmhg"]},
+    "life_support":    {"label": "Life support",    "indicators": ["heart_rate", "blood_pressure_sys", "blood_pressure_dia", "spo2", "co2_mmhg", "o2_partial_pressure_mmhg"]},
     "shielding":       {"label": "Shielding",       "indicators": ["radiation_total_msv", "radiation_event_msv", "temperature"]},
     "power":           {"label": "Power",           "indicators": ["blood_sugar"]},
-    "flight_computer": {"label": "Flight computer", "indicators": ["sleep_hours", "stress_score"]},
+    "flight_computer": {"label": "Flight computer", "indicators": ["sleep_hours", "stress_score", "mood_score", "fatigue_score"]},
 }
 
 def load_thresholds():

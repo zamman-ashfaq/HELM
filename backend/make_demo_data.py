@@ -21,6 +21,17 @@ for d in range(1, 31):
     })
 readings[-1]["temperature"] = 38.4
 
+# SpO2, mood and fatigue were added with the 5-category assessment. A separate
+# RNG keeps every value generated above byte-identical to the original demo file.
+r2 = random.Random(9)
+for r in readings:
+    t = r["day"] / 30
+    r["spo2"] = round(min(99, max(94, 98 - 1.2 * t + r2.uniform(-0.6, 0.6))), 1)
+    r["mood_score"] = round(min(96, max(22, 100 - r["stress_score"] + r2.uniform(-4, 4))), 1)
+    r["fatigue_score"] = round(min(88, max(10, 22 + 48 * t + r2.uniform(-4, 4))), 1)
+readings[-1]["spo2"] = 94.0
+readings[-1]["fatigue_score"] = 76.0
+
 out = Path(__file__).resolve().parent.parent / "data" / "demo_readings.json"
 out.write_text(json.dumps({"astronaut": {"name": "Demo Astronaut"}, "readings": readings}, indent=2))
 print("wrote", out)
