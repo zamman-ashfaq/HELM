@@ -1,0 +1,190 @@
+{
+  "_note": "Simulated scenarios for the demo. Anchors are real NASA findings; the exact curves are TEAM approximations.",
+  "scenarios": [
+    {
+      "id": "co2_fan_failure",
+      "title": "Air fans fail, CO2 builds up",
+      "crew": "B",
+      "duration_hours": 2,
+      "anchor": "NASA lunar outpost model: inspired CO2 about 10 mmHg after about 2 h with ventilation off (NTRS 20250006273)",
+      "steps": [
+        {
+          "t_hours": 0.0,
+          "co2_mmhg": 1.8,
+          "expected": "green"
+        },
+        {
+          "t_hours": 0.25,
+          "co2_mmhg": 2.8,
+          "expected": "yellow",
+          "event": "fans fail"
+        },
+        {
+          "t_hours": 0.5,
+          "co2_mmhg": 3.9,
+          "expected": "red",
+          "event": "crew reports headache"
+        },
+        {
+          "t_hours": 1.0,
+          "co2_mmhg": 5.9,
+          "expected": "red"
+        },
+        {
+          "t_hours": 1.5,
+          "co2_mmhg": 8.0,
+          "expected": "red"
+        },
+        {
+          "t_hours": 2.0,
+          "co2_mmhg": 10.0,
+          "expected": "critical",
+          "event": "emergency, escalate"
+        }
+      ],
+      "advisor_expected": "Name CO2 headache, check fans and scrubber, fresh air, escalate. Earth reply time shown."
+    },
+    {
+      "id": "solar_storm",
+      "title": "Solar particle event during Mars cruise",
+      "crew": "all",
+      "variants": [
+        {
+          "name": "moderate",
+          "event_dose_msv": 19.5,
+          "anchor": "Curiosity RAD March 2012 event, 19.5 mSv",
+          "expected": "yellow"
+        },
+        {
+          "name": "severe",
+          "event_dose_msv": 120,
+          "anchor": "TEAM, below the 250 mSv design reference",
+          "expected": "red"
+        }
+      ],
+      "start_total_msv": 220,
+      "base_rate_msv_per_day": 1.84,
+      "advisor_expected": "Go to shelter, track dose, report to commander and ground."
+    },
+    {
+      "id": "sleep_debt",
+      "title": "A week of short sleep",
+      "crew": "C",
+      "days": 7,
+      "sleep_hours": [
+        7.2,
+        6.8,
+        6.3,
+        6.0,
+        5.6,
+        5.4,
+        5.5
+      ],
+      "pvt_lapses": [
+        1,
+        1,
+        2,
+        4,
+        6,
+        8,
+        9
+      ],
+      "perclos": [
+        0.05,
+        0.06,
+        0.08,
+        0.11,
+        0.14,
+        0.17,
+        0.18
+      ],
+      "anchor": "ISS average 6.09 h against 8.5 h scheduled (Barger 2014); under 6 h linked to worse performance",
+      "expected_by_day": [
+        "green",
+        "green",
+        "yellow",
+        "yellow",
+        "red",
+        "red",
+        "red"
+      ],
+      "advisor_expected": "Recommend protecting sleep, avoiding safety-critical tasks, telling the commander."
+    },
+    {
+      "id": "infection_weak_signals",
+      "title": "Illness caught early from several weak signals",
+      "crew": "D",
+      "days": 5,
+      "resting_hr_pct_above_baseline": [
+        3,
+        6,
+        11,
+        16,
+        22
+      ],
+      "hrv_pct_below_baseline": [
+        10,
+        20,
+        30,
+        38,
+        45
+      ],
+      "sleep_hours": [
+        7.0,
+        6.8,
+        6.4,
+        6.1,
+        5.8
+      ],
+      "expected_single_metric_red_day": 4,
+      "expected_combined_flag_day": 2,
+      "anchor": "TEAM design for personal-baseline anomaly detection. No NASA threshold exists.",
+      "advisor_expected": "List possible causes from notes (respiratory infection, overtraining, sleep loss), suggest check by medical officer."
+    },
+    {
+      "id": "isolation_stress",
+      "title": "Mood and stress drift over a month",
+      "crew": "A",
+      "days": 30,
+      "weekly_stress": [
+        2,
+        2,
+        3,
+        3,
+        4,
+        5,
+        6
+      ],
+      "positive_mood_trend": "falling",
+      "anchor": "NASA APEX: positive mood tends to fall over time; stress follows events (NTRS 20260002661)",
+      "expected": "yellow flag from falling trend before the score itself turns red",
+      "advisor_expected": "Offer a private check-in, protect rest and exercise, arrange ground support call (delayed)."
+    },
+    {
+      "id": "comm_blackout_emergency",
+      "title": "Medical event with Earth unreachable",
+      "crew": "C",
+      "mode": "blackout",
+      "steps": [
+        {
+          "t_hours": 0.0,
+          "event": "link down, mars_far mode, autonomy 100 percent"
+        },
+        {
+          "t_hours": 3.0,
+          "event": "crew member reports chest pain and dizziness"
+        },
+        {
+          "t_hours": 3.0,
+          "action": "advisor flags ESCALATE, tells commander and medical officer, queues P0 message"
+        },
+        {
+          "t_hours": 8.0,
+          "event": "link returns, queue sent, expected ground reply in 48 minutes"
+        }
+      ],
+      "anchor": "NASA Earth-Independent Medical Operations concept; Mars round trip up to 48 min",
+      "advisor_expected": "Escalate first, give only monitoring and environment steps, no drug doses."
+    }
+  ]
+}
