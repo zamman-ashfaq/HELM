@@ -29,6 +29,9 @@ def init_db():
             heart_rate REAL,
             blood_pressure_sys REAL,
             blood_pressure_dia REAL,
+                        temperature REAL,
+            blood_sugar REAL,
+            exercise_min REAL,
             sleep_hours REAL,
             co2_mmhg REAL,
             o2_partial_pressure_mmhg REAL,
@@ -54,6 +57,9 @@ class CheckInPayload(BaseModel):
     radiation_total_msv: Optional[float] = None
     radiation_event_msv: Optional[float] = None
     stress_score: Optional[float] = None
+        temperature: Optional[float] = None
+      blood_sugar: Optional[float] = None
+      exercise_min: Optional[float] = None
     distance_from_earth_km: float
 
 @app.get("/api/status")
