@@ -1,0 +1,25 @@
+{
+  "astronaut": { "name": "Demo Astronaut", "mode": "mars" },
+  "systems": {
+    "structure":       { "label": "Structure",       "body": "Bones and muscle",      "indicators": ["exercise_min"] },
+    "life_support":    { "label": "Life support",    "body": "Heart and circulation", "indicators": ["heart_rate", "bp_systolic"] },
+    "shielding":       { "label": "Shielding",       "body": "Immune and radiation",  "indicators": ["temperature", "radiation_dose"] },
+    "power":           { "label": "Power",           "body": "Metabolism",            "indicators": ["blood_sugar"] },
+    "flight_computer": { "label": "Flight computer", "body": "Brain and mood",        "indicators": ["sleep_hours", "mood", "fatigue"] }
+  },
+  "indicators": {
+    "heart_rate":     { "label": "Heart rate",             "unit": "bpm",   "baseline": 62,   "limits": { "low": 45,   "high": 100 } },
+    "bp_systolic":    { "label": "Blood pressure",         "unit": "mmHg",  "baseline": 118,  "limits": { "low": 90,   "high": 140 } },
+    "temperature":    { "label": "Temperature",            "unit": "C",     "baseline": 36.6, "limits": { "low": 35.5, "high": 38.0 } },
+    "blood_sugar":    { "label": "Blood sugar",            "unit": "mg/dL", "baseline": 90,   "limits": { "low": 70,   "high": 140 } },
+    "sleep_hours":    { "label": "Sleep",                  "unit": "h",     "baseline": 7.5,  "limits": { "low": 5,    "high": 10 } },
+    "mood":           { "label": "Mood (1-10)",            "unit": "",      "baseline": 7,    "limits": { "low": 4,    "high": 10 } },
+    "exercise_min":   { "label": "Exercise",               "unit": "min",   "baseline": 120,  "limits": { "low": 60,   "high": 240 } },
+    "radiation_dose": { "label": "Radiation (cumulative)", "unit": "mSv",   "baseline": 0,    "limits": { "low": 0,    "high": 600 } },
+    "fatigue":        { "label": "Fatigue (camera)",       "unit": "0-100", "baseline": 20,   "limits": { "low": 0,    "high": 70 } }
+  },
+  "readings": [
+    { "day": 1, "heart_rate": 62, "bp_systolic": 118, "temperature": 36.6, "blood_sugar": 90, "sleep_hours": 7.5, "mood": 7, "exercise_min": 120, "radiation_dose": 1.0, "fatigue": 20 },
+    { "day": 2, "heart_rate": 64, "bp_systolic": 119, "temperature": 36.7, "blood_sugar": 92, "sleep_hours": 7.0, "mood": 7, "exercise_min": 110, "radiation_dose": 2.1, "fatigue": 22 }
+  ]
+}
