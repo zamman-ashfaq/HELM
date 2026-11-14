@@ -57,11 +57,10 @@ class CheckInPayload(BaseModel):
     radiation_total_msv: Optional[float] = None
     radiation_event_msv: Optional[float] = None
     stress_score: Optional[float] = None
-        temperature: Optional[float] = None
-      blood_sugar: Optional[float] = None
-      exercise_min: Optional[float] = None
+    temperature: Optional[float] = None
+    blood_sugar: Optional[float] = None
+    exercise_min: Optional[float] = None
     distance_from_earth_km: float
-
 @app.get("/api/status")
 def get_status():
     conn = sqlite3.connect(DB)
