@@ -10,27 +10,42 @@
    reuses stay in this file.
    ========================================================================== */
 
-/* Mission Control: day scrubber beside the flight-profile switch */
+/* Mission Control: one rhythm for the whole page — 16px between cards,
+   24px between rows, one 1200px container (theme.css --max-w). */
+.shell[data-page="mission"] { --gap-card: 16px; --gap-row: 24px; }
+.shell[data-page="mission"] .page > .stack { gap: var(--gap-row); }
+
+/* title + crew status chip */
+.shell[data-page="mission"] .title-row {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-top: 7px;
+}
+.shell[data-page="mission"] .title-row h1 { margin-top: 0; }
+.shell[data-page="mission"] #crewChip { font-size: 13px; }
+.shell[data-page="mission"] #crewChip:empty { display: none; }
+
+/* row 1: day scrubber + flight-profile switch in one control bar */
 .mission-bar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: stretch;
-}
-.flight-switch { display: flex; flex-wrap: wrap; gap: 10px; }
-.switch-group {
-  display: flex; flex-direction: column; gap: 7px;
-  padding: 8px 12px;
+  gap: 18px;
+  align-items: center;
+  padding: 10px 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(9, 15, 26, 0.66);
+  border-radius: var(--radius-m);
+  background: linear-gradient(180deg, rgba(17, 28, 47, 0.6), rgba(9, 15, 26, 0.66));
+}
+.flight-switch { display: flex; flex-wrap: wrap; gap: 18px; }
+.switch-group {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0; border: 0; background: none;
 }
 .switch-group .label { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 .switch-group .pill { align-self: flex-start; }
 
 /* the flight switch compresses before the scrubber does */
 @media (max-width: 1180px) {
-  .mission-bar { grid-template-columns: minmax(0, 1fr); }
+  .mission-bar { grid-template-columns: minmax(0, 1fr); gap: 12px; }
 }
 
 /* ---------- header band used by the four inner pages ---------- */
@@ -46,30 +61,52 @@
 .pagehead .panel-head { align-items: flex-end; margin-bottom: 0; }
 .pagehead h1 { font-size: clamp(26px, 2.6vw, 34px); margin-top: 7px; }
 
-/* status rail under the hero */
+/* row 2: four vitals, even columns */
 .status-rail { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.shell[data-page="mission"] .status-rail {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap-card);
+  align-items: stretch;
+}
 
-/* day scrubber (kept from the original panel) */
+/* day scrubber (kept from the original panel, borderless inside the bar) */
 .daybar {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding: 7px 12px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(9, 15, 26, 0.66);
+  padding: 0; border: 0; background: none;
 }
 .daybar .label { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 .daybar .dayval { font-family: var(--mono); font-size: 13px; color: var(--ink); min-width: 72px; }
 .daybar input[type="range"] { flex: 1; min-width: 120px; accent-color: var(--cyan); height: 4px; }
 .daybar .btn[disabled] { opacity: 0.4; }
 
+/* row 3: wellness (ring + autonomy) beside decision support, equal height */
+.shell[data-page="mission"] .mission-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap-card);
+  align-items: stretch;
+}
+.shell[data-page="mission"] .mission-split > .panel { display: flex; flex-direction: column; }
+
 /* wellness + autonomy block */
 .wellness-card {
   display: grid; grid-template-columns: 132px minmax(0, 1fr);
   gap: clamp(12px, 1.4vw, 20px); align-items: center;
 }
+.shell[data-page="mission"] .wellness-card {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  flex: 1;
+  align-content: center;
+  justify-items: center;
+}
 .wellness-ring { position: relative; }
+.shell[data-page="mission"] .wellness-ring { width: 212px; max-width: 100%; }
 .wellness-ring .ring-value { font-size: 32px; }
+.shell[data-page="mission"] .wellness-ring .ring-value { font-size: 52px; }
+.shell[data-page="mission"] .wellness-ring .ring-sub { font-size: 12px; }
 .autonomy { display: flex; flex-direction: column; gap: 8px; }
+.shell[data-page="mission"] .wellness-card .autonomy { width: 100%; }
 .autonomy-meter { position: relative; height: 10px; border-radius: 999px; overflow: hidden; background: rgba(8, 14, 24, 0.9); border: 1px solid var(--line); }
 .autonomy-meter i {
   position: absolute; inset: 0 auto 0 0; border-radius: 999px;
@@ -90,6 +127,11 @@
 .sys-bar .v { text-align: right; color: var(--c, var(--ink)); font-weight: 600; }
 
 /* category cards */
+.shell[data-page="mission"] #cats {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--gap-card);
+}
+.shell[data-page="mission"] #cats .cat-card { height: 100%; }
 .cat-card {
   position: relative;
   display: flex; flex-direction: column; gap: 9px;
@@ -125,15 +167,6 @@
 .cat-score span { font-size: 12px; color: var(--ink-3); }
 .cat-meta { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-3); }
 .cat-card svg.spark { width: 100%; height: 24px; color: var(--c, var(--cyan)); opacity: 0.85; }
-
-/* activity strip */
-.feed { display: flex; flex-direction: column; gap: 0; }
-.feed-row { display: flex; gap: 11px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
-.feed-row:first-child { border-top: 0; }
-.feed-time { font-family: var(--mono); font-size: 12px; color: var(--ink-3); min-width: 62px; padding-top: 2px; }
-.feed-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--cyan)); margin-top: 7px; flex: none; box-shadow: 0 0 10px var(--c, var(--cyan)); }
-.feed-text { color: var(--ink-2); min-width: 0; }
-.feed-text b { color: var(--ink); font-weight: 600; }
 
 /* ==========================================================================
    2 · HEALTH ASSESSMENT — clean medical
@@ -226,23 +259,64 @@
 /* ==========================================================================
    3 · HEALTH ANALYTICS — scientific
    ========================================================================== */
-.ana-top { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: clamp(12px, 1.3vw, 18px); }
-.ana-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 1.3vw, 18px); }
+/* 16px between cards, 24px between sections: one rhythm for the page. */
+.shell[data-page="analytics"] { --gap-card: 16px; --gap-row: 24px; }
+.shell[data-page="analytics"] .page > .stack { gap: var(--gap-row); }
+.shell[data-page="analytics"] .eyebrow,
+.shell[data-page="analytics"] .empty,
+.shell[data-page="analytics"] .chart-legend,
+.shell[data-page="analytics"] .change-row .arrow { font-size: 13px; }
+/* Axis and threshold captions are SVG user units, so they are sized here at the
+   same 13px the page states - the charts are drawn at their real pixel width. */
+.shell[data-page="analytics"] .chart .axis-text,
+.shell[data-page="analytics"] .chart .label-text { font-size: 13px; }
+.shell[data-page="analytics"] .chart-tip { font-size: 13px; }
+
+.ana-top { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: var(--gap-card); align-items: stretch; }
+.shell[data-page="analytics"] .ana-top > .panel { display: flex; flex-direction: column; }
+
+/* domain tabs */
+.dom-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: var(--gap-card); }
+.dom-tab {
+  font: inherit; font-size: 15px; line-height: 1.25;
+  padding: 9px 14px; border-radius: 10px; min-width: 0;
+  border: 1px solid var(--line);
+  background: rgba(11, 18, 30, 0.72);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s, color 0.16s;
+}
+.dom-tab:hover { border-color: var(--line-hi); color: var(--ink); }
+.dom-tab:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.dom-tab.on {
+  color: #fff;
+  border-color: rgba(34, 211, 238, 0.55);
+  background: linear-gradient(120deg, rgba(34, 211, 238, 0.2), rgba(34, 211, 238, 0.05));
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.12);
+}
+
+/* chart cards: as many columns as fit, never an empty slot */
+.ana-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--gap-card); align-items: stretch; }
 .ana-grid .span-all { grid-column: 1 / -1; }
+.chart-card { display: flex; flex-direction: column; }
+.chart-card .chart-head { margin-bottom: 8px; }
+.chart-card .chart-body { flex: 1; display: flex; align-items: flex-end; min-height: 190px; }
+.chart-card .chart-body > svg { width: 100%; }
 
 .chart-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
 .chart-head .grow { flex: 1; min-width: 140px; }
 .chart-head h3 { font-size: 16px; letter-spacing: 0.02em; }
-.chart-head .sub { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+.chart-head .sub { font-size: 13px; color: var(--ink-3); margin-top: 2px; }
 .chart-stat { text-align: right; }
 .chart-stat b { font-size: 20px; font-weight: 620; }
-.chart-stat span { display: block; font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.shell[data-page="analytics"] .chart-stat span { display: block; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
 .range-tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; gap: 2px; }
 .range-tabs button {
   border: 0; background: none; color: var(--ink-3); font: inherit; font-size: 15px;
   padding: 6px 14px; border-radius: 999px; cursor: pointer;
 }
 .range-tabs button.on { background: rgba(34, 211, 238, 0.16); color: var(--cyan-soft); }
+.range-tabs button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 
 .change-row {
   display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center;
@@ -250,21 +324,26 @@
 }
 .change-row:first-child { border-top: 0; }
 .change-row .name { color: var(--ink-2); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.change-row .arrow { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.change-row .arrow { font-family: var(--mono); color: var(--ink-3); }
 .change-row .pct { font-weight: 600; font-size: 13.5px; }
 .change-row .pct.up { color: var(--warn); }
 .change-row .pct.down { color: var(--cyan-soft); }
 .change-row .pct.flat { color: var(--ink-3); }
 
-.timeline { display: flex; flex-direction: column; gap: 0; }
-.tl-row { display: grid; grid-template-columns: 58px 14px minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+/* recent measurements: one line per day */
+.timeline { display: flex; flex-direction: column; }
+.tl-row {
+  display: grid; grid-template-columns: 46px 92px max-content minmax(0, 1fr);
+  gap: 12px; align-items: center;
+  padding: 9px 0; border-top: 1px solid var(--line);
+}
 .tl-row:first-child { border-top: 0; }
-.tl-day { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
-.tl-line { position: relative; height: 100%; display: grid; place-items: center; }
-.tl-line::before { content: ""; position: absolute; top: -8px; bottom: -8px; width: 1px; background: var(--line); }
-.tl-line i { width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--cyan)); box-shadow: 0 0 8px var(--c, var(--cyan)); position: relative; }
-.tl-text { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tl-val { font-size: 12.5px; color: var(--c, var(--ink-3)); font-weight: 600; }
+.tl-day { font-family: var(--mono); font-size: 13px; color: var(--ink-3); }
+.tl-score { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.tl-score b { font-size: 16px; font-weight: 640; color: var(--c, var(--ink)); }
+.tl-flag { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.tl-chips { display: flex; gap: 6px; min-width: 0; overflow: hidden; }
+.tl-chips .chip { font-size: 13px; padding: 3px 8px; white-space: nowrap; flex: none; }
 
 /* ==========================================================================
    4 · AI ASSISTANT — futuristic conversational
@@ -517,11 +596,20 @@
   .cat-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
+@media (max-width: 1100px) {
+  /* Mission Control: five domains are too tight before tablet width. */
+  .shell[data-page="mission"] #cats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 @media (max-width: 900px) {
   /* Narrow screens: the wellness ring and the domain tabs need the room. */
   .wellness-card { grid-template-columns: 108px minmax(0, 1fr); }
   .cat-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ana-grid { grid-template-columns: minmax(0, 1fr); }
+  /* Tablet: vitals and domains go two up, the panels stack. */
+  .shell[data-page="mission"] .status-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shell[data-page="mission"] #cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shell[data-page="mission"] .mission-split { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 640px) {
@@ -531,6 +619,20 @@
   /* Phone width: the domain name sits above its track instead of beside it. */
   .sys-bars { grid-template-columns: minmax(0, 1fr) 38px; row-gap: 5px; }
   .sys-bar > span:first-child { grid-column: 1 / -1; }
+  /* Mission Control at 390px: the scrubber puts the slider on its own line. */
+  .shell[data-page="mission"] .mission-bar { padding: 10px; }
+  .shell[data-page="mission"] .daybar { row-gap: 10px; }
+  .shell[data-page="mission"] .daybar input[type="range"] { order: 5; flex: 1 0 100%; }
+  .shell[data-page="mission"] .daybar [data-day="latest"] { order: 6; }
+  .shell[data-page="mission"] .switch-group { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .shell[data-page="mission"] .wellness-ring { width: 178px; }
+  .shell[data-page="mission"] .wellness-ring .ring-value { font-size: 44px; }
+  .shell[data-page="mission"] #cats .cat-card { padding: 12px; }
+  /* Health Analytics at 390px: tabs wrap, the record row stays on one line. */
+  .shell[data-page="analytics"] .dom-tab { padding: 8px 11px; }
+  .shell[data-page="analytics"] .tl-row { grid-template-columns: 34px max-content max-content minmax(0, 1fr); gap: 6px; }
+  .shell[data-page="analytics"] .tl-chips { gap: 4px; }
+  .shell[data-page="analytics"] .tl-chips .chip { padding: 2px 6px; }
 }
 
 /* short viewports (1366×768 laptops) */
