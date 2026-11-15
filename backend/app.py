@@ -1,4 +1,5 @@
 import sys
+import advisor
 import sqlite3
 from pathlib import Path
 from typing import Optional
@@ -86,3 +87,16 @@ def process_checkin(payload: CheckInPayload):
     conn.commit()
     conn.close()
     return {"status": "success", **result}
+
+class AdvicePayload(BaseModel):
+    question: Optional[str] = None
+
+
+@app.post("/api/advice")
+def get_advice(payload: AdvicePayload):
+    status = get_status()                      # same latest check-in + score.compute() as /api/status
+    if "indicators" not in status:             # no check-in saved yet
+        return {"answer": "No check-in data yet. Submit a check-in first, then ask again. "
+                          "Not medical advice. This is a wellness aid only.",
+                "source": "fallback", "notes_used": []}
+    return advisor.advise(status, payload.question)
