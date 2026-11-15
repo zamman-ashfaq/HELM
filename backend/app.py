@@ -68,7 +68,7 @@ class CheckInPayload(BaseModel):
     blood_pressure_dia: Optional[float] = None
     sleep_hours: Optional[float] = None
     co2_mmhg: Optional[float] = None
-    o2_partial_pressure_mmhg: Optional[float] = None
+    o2_partial_pressure_kpa: Optional[float] = None  # <-- Changed this line
     radiation_total_msv: Optional[float] = None
     radiation_event_msv: Optional[float] = None
     stress_score: Optional[float] = None
@@ -80,7 +80,6 @@ class CheckInPayload(BaseModel):
     fatigue_score: Optional[float] = None
     mobility_index: Optional[float] = None   # written by the physical-scan page
     distance_from_earth_km: float
-
 
 class AskPayload(BaseModel):
     question: str
@@ -102,6 +101,12 @@ def get_status():
 @app.post("/api/checkin")
 def process_checkin(payload: CheckInPayload):
     vitals = payload.model_dump(exclude_none=True)
+    
+    # Convert kPa from frontend to mmHg before passing to score.compute
+    if "o2_partial_pressure_kpa" in vitals:
+        kpa_val = vitals.pop("o2_partial_pressure_kpa")
+        vitals["o2_partial_pressure_mmhg"] = round(kpa_val * 7.50062, 2)
+
     result = score.compute(vitals)
     columns = list(vitals.keys()) + ["wellness_score", "autonomy_level"]
     values = list(vitals.values()) + [result["wellness"], result["autonomy"]]
@@ -113,8 +118,6 @@ def process_checkin(payload: CheckInPayload):
     conn.commit()
     conn.close()
     return {"status": "success", **result}
-
-
 # ---------------------------------------------------------------------------
 # Additive endpoints used by the redesigned frontend. The two endpoints above
 # keep their original request/response contract.
