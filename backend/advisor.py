@@ -15,6 +15,7 @@ Uses only the Python standard library (no pip install needed).
 """
 
 import json
+import os
 import re
 import urllib.request
 from pathlib import Path
@@ -68,11 +69,23 @@ GENERIC_WORDS = ["wellness", "health", "status", "advice", "advise", "recommend"
 # Extra note-file names to look for, besides the indicator key and system id
 # (e.g. knowledge/sleep.md is found for sleep_hours). Edit to match the research lead's file names.
 NOTE_ALIASES = {
-    "o2_partial_pressure_mmhg": ["oxygen"],
-    "co2_mmhg": ["carbon_dioxide"],
-    "blood_sugar": ["glucose", "nutrition"],
-    "stress_score": ["psych", "mental"],
+    "exercise_min":             ["heart_fitness"],
+    "heart_rate":               ["heart_fitness"],
+    "blood_pressure_sys":       ["heart_fitness"],
+    "blood_pressure_dia":       ["heart_fitness"],
+    "co2_mmhg":                 ["oxygen_co2"],
+    "o2_partial_pressure_mmhg": ["oxygen_co2"],
+    "radiation_total_msv":      ["radiation"],
+    "radiation_event_msv":      ["radiation"],
+    "sleep_hours":              ["sleep_fatigue"],
+    "stress_score":             ["mental_stress"],
 }
+# Notes that cover a topic rather than one indicator: used when the question mentions these words.
+TOPIC_NOTES = {
+    "distance_autonomy": ["autonomy", "delay", "signal", "distance", "earth", "ground"],
+}
+# A short catch-all note (covers every indicator) added after the specific notes, if it exists.
+CATCH_ALL_NOTE = "indicator_table"
 
 # ---------- rule-based fallback (research lead: replace with the 'actions' column of the indicator table) ----------
 FALLBACK_ACTIONS = {
@@ -151,9 +164,13 @@ def load_system_prompt():
     return p.read_text(encoding="utf-8") if p.exists() else DEFAULT_SYSTEM_PROMPT
 
 
-def find_notes(keys, notes):
+def find_notes(keys, notes, question=None):
     """Pick the few notes that match these indicators (by indicator key, system id or alias)."""
     found = []
+    q = _norm(question)
+    for stem, words in TOPIC_NOTES.items():          # topics the question names come first
+        if stem in notes and any(_norm(w) in q for w in words):
+            found.append(stem)
     for key in keys:
         cands = [key, _system_of(key)] + NOTE_ALIASES.get(key, [])
         for stem in notes:
@@ -161,7 +178,10 @@ def find_notes(keys, notes):
                 continue
             if any(c and (stem == c or stem in c or c in stem) for c in cands):
                 found.append(stem)
-    return found[:MAX_NOTES]
+    found = found[:MAX_NOTES - 1]
+    if found and CATCH_ALL_NOTE in notes and CATCH_ALL_NOTE not in found:
+        found.append(CATCH_ALL_NOTE)
+    return found
 
 
 # ---------- fallback ----------
@@ -249,7 +269,7 @@ def advise(status, question=None):
 
     keys = asked + [k for k in low if k not in asked]
     notes = load_notes()
-    used = find_notes(keys, notes)
+    used = find_notes(keys, notes, q)
     if not used:                               # no matching notes yet -> rule-based answer
         return fallback_answer(status, asked)
 
@@ -260,18 +280,31 @@ def advise(status, question=None):
         f"QUESTION: {q or 'Give me advice based on my current status.'}"
     )
 
+    def why(msg):                              # set ADVISOR_DEBUG=1 to see why the fallback was used
+        if os.environ.get("ADVISOR_DEBUG"):
+            print("[advisor] using fallback because:", msg)
+
     try:
         answer = call_ollama(load_system_prompt(), user_message)
-    except Exception:                          # Ollama off, too slow, or errored
+    except Exception as e:                     # Ollama off, too slow, or errored
+        why(repr(e))
         return fallback_answer(status, asked)
 
-    # Reject empty answers, or answers that cite none of the notes we sent.
-    low_answer = answer.lower()
-    cited = any(n in low_answer or n.replace("_", " ") in low_answer for n in used) or "not in my notes" in low_answer
-    if not answer or not cited:
+    if "not in my notes" in answer.lower():
+        return {"answer": NOT_COVERED, "source": "llm", "notes_used": []}
+
+    # Drop the model's own "Source:" line (it often invents a title); we add the real note names.
+    body = "\n".join(l for l in answer.splitlines() if not l.strip().lower().startswith("source")).strip()
+
+    # Grounding check: the answer must share some wording with the notes we sent.
+    note_words = set(re.findall(r"[a-z]{5,}", notes_text.lower()))
+    overlap = note_words & set(re.findall(r"[a-z]{5,}", body.lower()))
+    if len(body) < 20 or len(overlap) < 3:
+        why(f"answer empty or not grounded in the notes (overlap={len(overlap)}): {body[:80]!r}")
         return fallback_answer(status, asked)
 
-    return {"answer": f"{answer[:MAX_ANSWER_CHARS]}\n\n{DISCLAIMER}", "source": "llm", "notes_used": used}
+    return {"answer": f"{body[:MAX_ANSWER_CHARS]}\n\nSource: {', '.join(used)}\n{DISCLAIMER}",
+            "source": "llm", "notes_used": used}
 
 
 if __name__ == "__main__":
