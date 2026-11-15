@@ -40,22 +40,15 @@
   const autonomyLabel = (a) => (a < 35 ? "Self-manageable" : a <= 65 ? "Monitor and report" : "Act now, inform Earth");
 
   /* ---------------------------------------------------------------- parts */
-  function chip(label, value) {
-    return '<span class="chip">' + label + (value != null ? " <b>" + esc(value) + "</b>" : "") + "</span>";
-  }
+  const chipCls = (s) => (s === "WARNING" ? "is-crit" : s === "CAUTION" ? "is-warn" : "is-ok");
 
-  function renderChips(st, cur) {
-    const mode = H.state.mode;
-    const m = MODES[mode];
-    const host = $("#missionChips");
+  // One chip only: the crew status, sitting beside the page title.
+  function renderCrewChip(st) {
+    const host = $("#crewChip");
     if (!host) return;
-    host.innerHTML =
-      chip("Crew", "B") +
-      chip("Astronaut", H.DEMO.astronaut) +
-      chip("Mission day", cur.day != null ? cur.day : "--") +
-      chip(m.note, Math.round(m.km / 1e6) + " M km") +
-      chip("Signal", fmtDelay(H.delaySeconds(m.km)) + " one way") +
-      chip("Crew status", statusOf(st.worst));
+    const s = statusOf(st.worst);
+    host.className = "chip " + chipCls(s);
+    host.innerHTML = "Crew status <b>" + esc(s) + "</b>";
   }
 
   function sparkFor(t, key, n) {
@@ -131,18 +124,6 @@
   function renderWellness(st) {
     const s = statusOf(st.worst);
     const auto = st.autonomy;
-    const bars = Object.keys(H.SYS).map((sid) => {
-      const sys = st.systems[sid];
-      const sc = sys && sys.score;
-      const c = sys ? colorFor(sys.status) : "#64748b";
-      return (
-        '<div class="sys-bar" style="--c:' + c + '">' +
-          "<span>" + esc(H.SYS[sid].label) + "</span>" +
-          '<span class="track"><i style="width:' + (sc == null ? 0 : sc) + '%"></i></span>' +
-          '<span class="v">' + (sc == null ? "--" : sc) + "</span>" +
-        "</div>"
-      );
-    }).join("");
 
     $("#wellnessPanel").innerHTML =
       '<div class="panel-head">' +
@@ -152,7 +133,7 @@
         '<span class="badge ' + clsOf(s) + '">' + esc(s) + "</span>" +
       "</div>" +
       '<div class="wellness-card">' +
-        '<div class="wellness-ring">' + Ch.ring(st.wellness, { size: 132, label: "WELLNESS", color: colorFor(s) }) + "</div>" +
+        '<div class="wellness-ring">' + Ch.ring(st.wellness, { size: 200, stroke: 10, label: "WELLNESS", color: colorFor(s) }) + "</div>" +
         '<div class="autonomy">' +
           '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">' +
             '<span class="eyebrow">Autonomy meter</span><b style="font-size:18px">' + auto + '<span class="muted small">/100</span></b>' +
@@ -161,7 +142,6 @@
             '<span class="marker" style="left:calc(' + auto + "% - 1.5px)\"></span></div>" +
           '<p class="small muted" style="margin:0">' + esc(autonomyLabel(auto)) +
             " · signal delay " + fmtDelay(st.signal_delay_s) + " one way.</p>" +
-          '<div class="sys-bars">' + bars + "</div>" +
         "</div>" +
       "</div>";
   }
@@ -228,57 +208,6 @@
         '<div class="cat-meta">' + icon("activity") + "<span>" + esc(H.SYS[c.sys].body) + "</span></div>" +
       "</a>";
     }).join("");
-  }
-
-  function renderTrend(st, t) {
-    const slice = t.slice(-14);
-    const labels = slice.map((r) => "D" + (r.day == null ? "?" : r.day));
-    const values = slice.map((r) => H.compute(r, H.BASE).wellness);
-    const chart = Ch.line({
-      labels,
-      series: [{ name: "Wellness", color: "#22d3ee", values, area: true }],
-      domain: [0, 100],
-      height: 186,
-      decimals: 0,
-      title: "Wellness score progression",
-    });
-    const first = values[0], last = values[values.length - 1];
-    const diff = first == null || last == null ? null : last - first;
-
-    $("#trendPanel").innerHTML =
-      '<div class="chart-head"><div class="grow">' +
-        '<span class="eyebrow">14-day progression</span>' +
-        '<h3 style="margin-top:5px">Wellness score</h3>' +
-        '<div class="sub">Computed with the same rules as the backend scoring engine.</div>' +
-      "</div>" +
-      '<div class="chart-stat"><b>' + (last == null ? "--" : last) + "</b><span>" +
-        (diff == null ? "no trend" : (diff > 0 ? "+" : "") + diff + " pts") + "</span></div></div>" +
-      '<div id="trendChart"></div>' +
-      '<p class="small muted" style="margin-top:8px">Green band is nominal (70-100). The score is the mean of the five domain scores, capped at 60 when any domain is critical.</p>';
-    Ch.render($("#trendChart"), chart);
-  }
-
-  function renderFeed(t) {
-    const rows = t.slice(-6).reverse();
-    $("#feedPanel").innerHTML =
-      '<div class="panel-head"><div><span class="eyebrow">Record</span>' +
-        '<h3 style="margin-top:5px">Recent check-ins</h3></div><span class="spacer"></span>' +
-        '<span class="pill">' + icon(H.state.online ? "signal" : "offline") +
-        (H.state.online ? "Backend live" : "Offline record") + "</span></div>" +
-      '<div class="feed">' + rows.map((r) => {
-        const stt = H.compute(r, H.BASE);
-        const s = statusOf(stt.worst);
-        const flags = Object.keys(stt.indicators).filter((k) => stt.indicators[k].status !== "NOMINAL");
-        return '<div class="feed-row" style="--c:' + colorFor(s) + '">' +
-          '<span class="feed-time">' + esc(H.dayLabel(r)) + "</span>" +
-          '<span class="feed-dot"></span>' +
-          '<span class="feed-text">Wellness <b>' + stt.wellness + "</b> · " +
-            (flags.length ? esc(flags.map((k) => stt.indicators[k].label).join(", ")) + " flagged" : "no flags") +
-            (r._api ? ' · <span class="mono">db</span>' : r.day > 30 ? ' · <span class="mono">local</span>' : "") +
-          "</span>" +
-          '<span class="badge ' + clsOf(s) + '">' + stt.wellness + "</span>" +
-        "</div>";
-      }).join("") + "</div>";
   }
 
   /* ----------------------------------------------------------------- boot */
@@ -348,13 +277,11 @@
     const st = H.compute(Object.assign({}, cur, { distance_from_earth_km: MODES[H.state.mode].km }), H.BASE);
 
     syncDaybar(t, view);
-    renderChips(st, cur);
+    renderCrewChip(st);
     renderVitals(st, past);
     renderWellness(st);
     renderAdvice(st);
     renderCats(st, past);
-    renderTrend(st, past);
-    renderFeed(past);
   }
 
   H.ready(() => {

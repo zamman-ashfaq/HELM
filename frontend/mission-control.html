@@ -18,7 +18,10 @@
       <div class="wrap panel-head rise" style="margin-bottom:0">
         <div>
           <span class="eyebrow">Mission control</span>
-          <h1>Mission overview</h1>
+          <div class="title-row">
+            <h1>Mission overview</h1>
+            <span class="chip" id="crewChip" aria-live="polite"></span>
+          </div>
           <p class="muted small" style="margin-top:4px">Live vitals, wellness and the five health domains for the selected mission day.</p>
         </div>
         <span class="spacer"></span>
@@ -27,8 +30,6 @@
     </header>
 
     <div class="wrap stack">
-
-      <section class="chips" id="missionChips" aria-label="Mission context"></section>
 
       <!-- Day scrubber + flight profile: the distance profile drives the signal
            delay and the autonomy advice further down the page. -->
@@ -44,16 +45,12 @@
               <button type="button" data-mode="mars" aria-pressed="true" class="on">Mars transit</button>
             </div>
           </div>
-          <div class="switch-group">
-            <span class="label">Signal to Earth</span>
-            <span class="pill" id="pillMode"></span>
-          </div>
         </div>
       </div>
 
       <section class="status-rail" id="vitals" aria-label="Current vitals"></section>
 
-      <section class="split">
+      <section class="mission-split">
         <div class="panel" id="wellnessPanel" aria-live="polite"></div>
         <div class="panel" id="advicePanel"></div>
       </section>
@@ -67,12 +64,7 @@
           <span class="spacer"></span>
           <a class="btn btn-sm btn-ghost" href="analytics.html">Open analytics</a>
         </div>
-        <div class="grid g-5" id="cats"></div>
-      </section>
-
-      <section class="split-even">
-        <div class="panel" id="trendPanel"></div>
-        <div class="panel" id="feedPanel"></div>
+        <div class="grid" id="cats"></div>
       </section>
 
     </div>
