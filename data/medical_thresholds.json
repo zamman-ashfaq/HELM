@@ -1,0 +1,137 @@
+{
+  "_note": "Warning = start of the yellow band, critical = start of the red band. Sources are in knowledge/*.md and knowledge/verification_log.md. basis: nasa = anchored on a NASA number (bands are still TEAM choices), clinical = general medical range, app = defined by the HELM team. Astronaut data is simulated. Not a medical device.",
+  "indicators": {
+    "heart_rate": {
+      "label": "Heart rate",
+      "unit": "bpm",
+      "warning_low": 50,
+      "warning_high": 100,
+      "critical_low": 40,
+      "critical_high": 130,
+      "basis": "clinical",
+      "source": "General adult resting range. NASA gives no universal heart-rate limit; HELM also flags drift from the person's own baseline.",
+      "verified": false
+    },
+    "blood_pressure_sys": {
+      "label": "Blood pressure (systolic)",
+      "unit": "mmHg",
+      "warning_low": 95,
+      "warning_high": 135,
+      "critical_low": 80,
+      "critical_high": 160,
+      "basis": "clinical",
+      "source": "General clinical range, not yet checked against a cited source.",
+      "verified": false
+    },
+    "blood_pressure_dia": {
+      "label": "Blood pressure (diastolic)",
+      "unit": "mmHg",
+      "warning_low": 60,
+      "warning_high": 85,
+      "critical_low": 50,
+      "critical_high": 100,
+      "basis": "clinical",
+      "source": "General clinical range, not yet checked against a cited source.",
+      "verified": false
+    },
+    "temperature": {
+      "label": "Body temperature",
+      "unit": "C",
+      "warning_low": 35.5,
+      "warning_high": 37.5,
+      "critical_low": 34.5,
+      "critical_high": 38,
+      "basis": "clinical",
+      "source": "Fever is commonly defined as 38.0 C or higher. Not from NASA.",
+      "verified": false
+    },
+    "blood_sugar": {
+      "label": "Blood sugar",
+      "unit": "mg/dL",
+      "warning_low": 70,
+      "warning_high": 140,
+      "critical_low": 54,
+      "critical_high": 250,
+      "basis": "clinical",
+      "source": "General clinical range, not yet checked against a cited source.",
+      "verified": false
+    },
+    "sleep_hours": {
+      "label": "Sleep",
+      "unit": "h",
+      "warning_low": 7,
+      "warning_high": null,
+      "critical_low": 6,
+      "critical_high": null,
+      "basis": "nasa",
+      "source": "Barger et al., Lancet Neurology 2014: NASA schedules 8.5 h, ISS crews averaged 6.09 h. Green 7 h or more, yellow 6 to 7, red under 6 (team bands). Research suggests a 3-night average.",
+      "verified": true
+    },
+    "exercise_min": {
+      "label": "Exercise",
+      "unit": "min",
+      "warning_low": 120,
+      "warning_high": null,
+      "critical_low": 75,
+      "critical_high": null,
+      "basis": "nasa",
+      "source": "NASA ISS plan of 2.5 h (150 min) per day. Yellow below 80 percent of plan (120 min), red below 50 percent (75 min). Percent bands are team choices.",
+      "verified": true
+    },
+    "stress_score": {
+      "label": "Stress (0-100)",
+      "unit": "",
+      "warning_low": null,
+      "warning_high": 60,
+      "critical_low": null,
+      "critical_high": 80,
+      "basis": "app",
+      "source": "Team-defined, simplified scale. NASA uses POMS and BDI-II. The research notes use a 0-10 scale; this app uses 0-100.",
+      "verified": false
+    },
+    "radiation_total_msv": {
+      "label": "Radiation (cumulative)",
+      "unit": "mSv",
+      "warning_low": null,
+      "warning_high": 300,
+      "critical_low": null,
+      "critical_high": 480,
+      "basis": "nasa",
+      "source": "NASA-STD-3001 Vol 1 Rev C [V1 4030]: career limit 600 mSv. Yellow from 300 (50 percent), red from 480 (80 percent), critical at 600 (team bands).",
+      "verified": true
+    },
+    "radiation_event_msv": {
+      "label": "Radiation (single event)",
+      "unit": "mSv",
+      "warning_low": null,
+      "warning_high": 20,
+      "critical_low": null,
+      "critical_high": 100,
+      "basis": "nasa",
+      "source": "Anchors: 19.5 mSv moderate solar event measured by Curiosity RAD; 250 mSv NASA design reference storm [V1 4031]. Yellow from 20, red from 100 (team bands).",
+      "verified": true
+    },
+    "co2_mmhg": {
+      "label": "Cabin CO2 (1-hour average)",
+      "unit": "mmHg",
+      "warning_low": null,
+      "warning_high": 2.3,
+      "critical_low": null,
+      "critical_high": 3,
+      "basis": "nasa",
+      "source": "Symptoms reported by ISS crew from about 2.3 mmHg; NASA-STD-3001 Vol 2 [V2 6004] limit 3.0 mmHg (1-hour average).",
+      "verified": true
+    },
+    "o2_partial_pressure_mmhg": {
+      "label": "Cabin O2 partial pressure (kPa)",
+      "unit": "kPa",
+      "warning_low": 19.5,
+      "warning_high": 23.1,
+      "critical_low": 18.5,
+      "critical_high": 24.1,
+      "basis": "nasa",
+      "source": "ISS cabin design range 19.5 to 23.1 kPa (NASA NTRS 20120015343). The 1 kPa yellow margin is a team choice. The key name says mmhg but the unit is kPa.",
+      "verified": true
+    }
+  }
+}
