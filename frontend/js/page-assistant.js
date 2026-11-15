@@ -10,11 +10,13 @@
   const H = window.HELM;
   const { $, esc, num, icon, statusOf, clsOf } = H;
 
+  // `label` is the per-answer chip: LLM only when the model wrote the answer.
   const SRC = {
-    llm:         { label: "ONBOARD LLM", badge: "is-nominal", text: "Onboard model" },
-    fallback:    { label: "RULE-BASED", badge: "is-caution", text: "Rule-based fallback" },
-    offline:     { label: "OFFLINE",    badge: "is-caution", text: "Offline rules" },
-    unavailable: { label: "UNAVAILABLE", badge: "is-warning", text: "Advisor module missing" },
+    llm:         { label: "LLM",         badge: "is-nominal", text: "LLM · llama3.2:3b · on device" },
+    fallback:    { label: "Rule-based",  badge: "is-caution", text: "Rule-based fallback" },
+    offline:     { label: "Rule-based",  badge: "is-caution", text: "Offline rules mode" },
+    unavailable: { label: "Unavailable", badge: "is-warning", text: "Advisor module missing" },
+    error:       { label: "Rule-based",  badge: "is-caution", text: "Offline rules mode" },
   };
 
   // `label` is the chip, `q` is what actually gets asked.
@@ -45,9 +47,9 @@
   }
 
   function engine() {
-    if (!H.state.online) return { key: "offline", text: "Fully offline · rule-based answers" };
-    if (H.state.llm) return { key: "llm", text: (H.state.llmModel || "Local model") + " · local inference" };
-    return { key: "fallback", text: "Model idle · server-side rules" };
+    if (!H.state.online) return { key: "offline", text: "Offline rules mode · answers from the local knowledge files" };
+    if (H.state.llm) return { key: "llm", text: "LLM · " + (H.state.llmModel || "llama3.2:3b") + " · on device" };
+    return { key: "fallback", text: "Offline rules mode · model not reachable" };
   }
 
   function renderEngine() {
@@ -55,12 +57,12 @@
     const pill = $("#enginePill");
     pill.className = "pill " + (e.key === "llm" ? "is-live" : e.key === "fallback" ? "is-ok" : "is-warn");
     pill.innerHTML = icon(e.key === "llm" ? "spark" : e.key === "fallback" ? "shield" : "offline") +
-      "<span>" + esc(e.key === "llm" ? "Local LLM" : e.key === "fallback" ? "Rule-based" : "Offline") + "</span>";
+      "<span>" + esc(e.key === "llm" ? "LLM · llama3.2:3b · on device" : "Offline rules mode") + "</span>";
 
     renderEngine._last = e.key;
     $("#chatAvatar").innerHTML = icon("brain");
     $("#chatSub").textContent = e.text;
-    $("#srcFoot").textContent = "Advisor: " + (e.key === "llm" ? e.text : e.key === "fallback" ? "rule-based fallback (model idle)" : "offline rules");
+    $("#srcFoot").textContent = "Advisor: " + (e.key === "llm" ? e.text : e.key === "fallback" ? "rule-based fallback (model idle)" : "offline rules mode");
   }
 
   function renderContext() {
@@ -112,7 +114,7 @@
       const src = SRC[(meta && meta.source) || "offline"] || SRC.offline;
       const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
       m.innerHTML =
-        '<span class="badge ' + src.badge + '" style="font-size:9px;padding:2px 6px">' + src.label + "</span>" +
+        '<span class="badge ' + src.badge + '" style="font-size:9px;padding:2px 6px;text-transform:none;letter-spacing:.04em">' + esc(src.label) + "</span>" +
         "<span>" + esc(src.text) + " · " + time + "</span>" +
         '<span class="msg-tools">' +
           '<button type="button" data-speak>' + icon("volume") + "Read</button>" +
@@ -142,7 +144,8 @@
   function pushTyping() {
     const el = document.createElement("div");
     el.className = "msg ai";
-    el.innerHTML = '<div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div>';
+    el.innerHTML = '<div class="bubble"><span class="typing"><i></i><i></i><i></i></span> ' +
+      '<span class="muted" style="font-size:12px">Thinking…</span></div>';
     $("#log").appendChild(el);
     scrollDown();
     return el;

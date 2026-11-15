@@ -15,16 +15,35 @@ Uses only the Python standard library (no pip install needed).
 """
 
 import json
+import os
 import re
 import urllib.request
 from pathlib import Path
 
 # ---------- settings you can change ----------
-OLLAMA_URL = "http://localhost:11434/api/chat"
-MODEL = "llama3.2:3b"            # or "qwen2.5:3b"
+def ollama_base(url=None):
+    """Ollama base URL, from OLLAMA_URL or the local default.
+
+    A full endpoint (/api/chat, /api/tags) is accepted as well, so an old value
+    from another machine still works.
+    """
+    base = (url if url is not None else os.environ.get("OLLAMA_URL") or "").strip()
+    base = (base or "http://127.0.0.1:11434").rstrip("/")
+    for suffix in ("/api/chat", "/api/tags"):
+        if base.endswith(suffix):
+            base = base[: -len(suffix)]
+    return base.rstrip("/")
+
+OLLAMA_BASE = ollama_base()      # set OLLAMA_URL to point at another machine
+OLLAMA_CHAT_URL = OLLAMA_BASE + "/api/chat"
+OLLAMA_TAGS_URL = OLLAMA_BASE + "/api/tags"
+MODEL = os.environ.get("OLLAMA_MODEL") or "llama3.2:3b"   # or "qwen2.5:3b"
 TIMEOUT_SECONDS = 30             # first call after a cold start can be slow on a laptop; later calls take ~1-5 s
 NOMINAL_MIN = 70                 # same as score.py: below this = CAUTION / WARNING
 HIGH_DELAY_S = 60                # above this, remind the astronaut Earth can't help in real time
+ESCALATE = ("One or more values are outside the safe band: contact the flight surgeon "
+            "or the ground medical team now.")
+MODE_LABEL = {"iss": "ISS / LEO", "moon": "Moon / lunar vicinity", "mars": "Mars transit"}
 MAX_NOTES = 3                    # small models cope badly with long prompts
 MAX_NOTE_CHARS = 1500
 MAX_ANSWER_CHARS = 700
@@ -73,11 +92,18 @@ GENERIC_WORDS = ["wellness", "health", "status", "advice", "advise", "recommend"
 NOTE_ALIASES = {
     "o2_partial_pressure_mmhg": ["oxygen"],
     "spo2": ["oxygen"],
-    "co2_mmhg": ["carbon_dioxide"],
-    "blood_sugar": ["glucose", "nutrition"],
+    "co2_mmhg": ["carbon_dioxide", "oxygen_co2", "co2"],
+    "blood_sugar": ["glucose", "nutrition", "common_conditions"],
     "stress_score": ["psych", "mental"],
     "mood_score": ["mental", "stress"],
     "fatigue_score": ["sleep", "fatigue"],
+    # the note files are named by topic, not by column: map the common ones
+    "sleep_hours": ["sleep", "fatigue"],
+    "exercise_min": ["fitness", "heart"],
+    "heart_rate": ["heart"],
+    "blood_pressure_sys": ["common_conditions", "blood"],
+    "blood_pressure_dia": ["common_conditions", "blood"],
+    "temperature": ["common_conditions"],
 }
 
 # ---------- rule-based fallback (research lead: replace with the 'actions' column of the indicator table) ----------
@@ -136,6 +162,36 @@ def is_generic(question):
     return any(_norm(w) in q for w in GENERIC_WORDS)
 
 
+def critical_indicators(status):
+    """Indicator keys scored WARNING by score.py (the lowest band)."""
+    return [k for k, v in status.get("indicators", {}).items()
+            if str(v.get("status", "")).upper() == "WARNING"]
+
+
+def _mission_block(status, context):
+    """The real mission facts the prompt is built from (never guessed by the model)."""
+    ctx = context or {}
+    mode_key = str(ctx.get("mode") or "").strip().lower()
+    mode = MODE_LABEL.get(mode_key) or (ctx.get("mode") or None)
+    lines = []
+    if ctx.get("mission_day") is not None:
+        lines.append("Mission day: " + str(ctx.get("mission_day")))
+    if mode:
+        lines.append("Location mode: " + str(mode))
+    km = ctx.get("distance_km")
+    if isinstance(km, (int, float)):
+        lines.append("Distance from Earth: " + format(round(km), ",") + " km")
+    delay = status.get("signal_delay_s")
+    if isinstance(delay, (int, float)):
+        lines.append("Signal delay: " + str(round(delay, 1)) + " s (one way)")
+    checkin = ctx.get("checkin")
+    if isinstance(checkin, dict) and checkin:
+        clean = {k: v for k, v in checkin.items() if v is not None and k not in ("_api", "events")}
+        if clean:
+            lines.append("Latest check-in: " + json.dumps(clean, sort_keys=True))
+    return "\n".join(lines) or "No mission context was supplied."
+
+
 def low_indicators(status):
     """Indicator keys whose score is below NOMINAL_MIN, worst first."""
     low = [(k, v) for k, v in status.get("indicators", {}).items()
@@ -189,6 +245,8 @@ def fallback_answer(status, asked=()):
     wellness = status.get("wellness", "n/a")
     low = low_indicators(status)
     parts = [f"Wellness is {wellness}/100."]
+    if critical_indicators(status):
+        parts.append(ESCALATE)
 
     shown = []
     for key in list(asked) + low:          # what they asked about first, then the worst problems
@@ -223,7 +281,7 @@ def call_ollama(system_prompt, user_message):
             {"role": "user", "content": user_message},
         ],
     }).encode("utf-8")
-    req = urllib.request.Request(OLLAMA_URL, data=body, headers={"Content-Type": "application/json"})
+    req = urllib.request.Request(OLLAMA_CHAT_URL, data=body, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=TIMEOUT_SECONDS) as resp:
         return json.loads(resp.read())["message"]["content"].strip()
 
@@ -244,16 +302,37 @@ def _compact_status(status, keys):
 
 
 def ping(timeout=2.0):
-    """True when the local Ollama server answers. Used by GET /api/health."""
+    """True when the Ollama server answers. Used by GET /api/health."""
     try:
-        with urllib.request.urlopen(OLLAMA_URL.rsplit("/", 1)[0] + "/tags", timeout=timeout) as resp:
+        with urllib.request.urlopen(OLLAMA_TAGS_URL, timeout=timeout) as resp:
             return resp.status == 200
     except Exception:
         return False
 
 
+def model_ready(timeout=2.0):
+    """True only when the local server answers AND it has the configured model pulled.
+
+    GET /api/health reports `llm` from this, so a running Ollama without
+    llama3.2:3b is reported honestly as llm: false.
+    """
+    try:
+        with urllib.request.urlopen(OLLAMA_TAGS_URL, timeout=timeout) as resp:
+            if resp.status != 200:
+                return False
+            tags = json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        return False
+    base = MODEL.split(":")[0]
+    for m in tags.get("models", []):
+        name = str(m.get("name") or m.get("model") or "")
+        if name == MODEL or name.startswith(base):
+            return True
+    return False
+
+
 # ---------- the one function everyone calls ----------
-def advise(status, question=None):
+def advise(status, question=None, context=None):
     q = (question or "").strip() or None
     asked = question_indicators(q) if q else []
 
@@ -261,21 +340,31 @@ def advise(status, question=None):
     if q and not asked and not is_generic(q):
         return {"answer": NOT_COVERED, "source": "fallback", "notes_used": []}
 
+    # No measurements at all: say so instead of letting the model guess.
+    if not status.get("indicators"):
+        return {"answer": "not enough data: no check-in has been recorded yet. " + DISCLAIMER,
+                "source": "fallback", "notes_used": []}
+
     low = low_indicators(status)
     if not q and not low:                      # nothing wrong and nothing asked: no need for the LLM
         return fallback_answer(status)
 
     keys = asked + [k for k in low if k not in asked]
+    if not keys:                               # general question, everything nominal: still use the model
+        keys = ["sleep_hours", "stress_score", "heart_rate"]
     notes = load_notes()
     used = find_notes(keys, notes)
     if not used:                               # no matching notes yet -> rule-based answer
         return fallback_answer(status, asked)
 
     notes_text = "\n\n".join(f"### NOTE: {n}\n{notes[n][:MAX_NOTE_CHARS]}" for n in used)
+    critical = critical_indicators(status)
     user_message = (
+        f"MISSION:\n{_mission_block(status, context)}\n\n"
         f"STATUS:\n{json.dumps(_compact_status(status, keys[:6]))}\n\n"
         f"NOTES:\n{notes_text}\n\n"
-        f"QUESTION: {q or 'Give me advice based on my current status.'}"
+        + (f"CRITICAL: {', '.join(critical)} scored WARNING. {ESCALATE}\n\n" if critical else "")
+        + f"QUESTION: {q or 'Give me advice based on my current status.'}"
     )
 
     try:

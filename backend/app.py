@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -85,6 +86,8 @@ class AskPayload(BaseModel):
     question: str
     astronaut_id: Optional[str] = None
     vitals: Optional[dict] = None   # optional: compute the status from these instead of the DB row
+    mode: Optional[str] = None      # iss | moon | mars, as selected on the page
+    mission_day: Optional[int] = None
 @app.get("/api/status")
 def get_status():
     conn = sqlite3.connect(DB)
@@ -139,6 +142,27 @@ def get_history(limit: int = 90):
 @app.post("/api/ask")
 def ask(payload: AskPayload):
     """Local-LLM advisor. Uses the request vitals if given, else the newest DB row."""
+    try:
+        return _ask(payload)
+    except Exception as exc:  # the endpoint must never take the server down
+        return JSONResponse(status_code=503, content={
+            "error": "advisor failed: " + exc.__class__.__name__ + ": " + str(exc)[:200],
+            "source": "error",
+        })
+
+
+def _mode_of(km):
+    """Same three modes the page offers, derived from the distance when not sent."""
+    if not isinstance(km, (int, float)):
+        return None
+    if km < 1000:
+        return "iss"
+    if km < 1000000:
+        return "moon"
+    return "mars"
+
+
+def _ask(payload: AskPayload):
     vitals = dict(payload.vitals or {})
     if not vitals:
         conn = sqlite3.connect(DB)
@@ -151,10 +175,19 @@ def ask(payload: AskPayload):
     status = score.compute(vitals) if vitals else {
         "wellness": None, "systems": {}, "indicators": {}, "autonomy": 0, "signal_delay_s": 0
     }
+
+    # Everything the prompt is built from comes from here: real numbers only.
+    context = {
+        "mode": payload.mode or _mode_of(vitals.get("distance_from_earth_km")),
+        "mission_day": payload.mission_day,
+        "distance_km": vitals.get("distance_from_earth_km"),
+        "checkin": vitals,
+    }
+
     if advisor is None:
         return {"answer": "The local advisor module is not available on this machine.",
                 "source": "unavailable", "notes_used": [], "status": status}
-    result = advisor.advise(status, payload.question)
+    result = advisor.advise(status, payload.question, context)
     return {**result, "status": status}
 
 
@@ -184,7 +217,8 @@ _LLM_CACHE = {"llm": False, "ts": 0.0, "busy": False}
 
 def _refresh_llm():
     try:
-        _LLM_CACHE["llm"] = bool(advisor.ping(timeout=1.5))
+        check = getattr(advisor, "model_ready", None) or advisor.ping
+        _LLM_CACHE["llm"] = bool(check(timeout=1.5))
     except Exception:
         _LLM_CACHE["llm"] = False
     finally:
