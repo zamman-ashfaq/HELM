@@ -44,6 +44,7 @@
             '<span class="brand-mark">' + icon("helm") + "</span>" +
             '<span class="brand-text"><b>HELM</b><span>Astronaut health</span></span>' +
           "</a>" +
+          '<ul class="nav-menu" id="navMenu">' + links + "</ul>" +
           // paintShell() owns #pillLink and rewrites its class list, so the
           // wrapper is what the responsive rules switch off.
           '<span class="nav-status"><span class="pill" id="pillLink">' + icon("offline") +
@@ -52,7 +53,6 @@
             'aria-controls="navMenu" aria-label="Open menu">' +
             "<span></span><span></span><span></span>" +
           "</button>" +
-          '<ul class="nav-menu" id="navMenu">' + links + "</ul>" +
         "</nav>" +
       "</div>";
 
@@ -82,7 +82,7 @@
     });
 
     // Growing past the breakpoint restores the horizontal bar.
-    const wide = window.matchMedia("(min-width: 1001px)");
+    const wide = window.matchMedia("(min-width: 1100px)");
     const onWide = () => { if (wide.matches) setOpen(false); };
     if (wide.addEventListener) wide.addEventListener("change", onWide);
     else if (wide.addListener) wide.addListener(onWide);

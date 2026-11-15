@@ -1,0 +1,169 @@
+/* ==========================================================================
+   HELM · front page
+   One full-screen scene. The ISS photograph covers the whole viewport, the
+   astronaut stays in the right half and the left half is darkened so the copy
+   reads: heading, one tagline, two ways in. Every rule here is scoped to
+   .hero or to the home shell, so the five mission pages are untouched.
+   Loaded by index.html only.
+   ========================================================================== */
+
+/* ---------- bar: no backend badge in the top right of the front page ------ */
+/* paintShell() still writes into #pillLink, the element is simply not shown
+   here; the other pages keep the badge. */
+.shell[data-page="home"] .nav-status { display: none; }
+
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #040912;
+  isolation: isolate;
+  padding-top: var(--nav-h, 68px);
+}
+
+/* ---------- the photograph ---------- */
+/* 0,0 to full width and height: no mask, no blur, no transform. The crop is
+   driven by object-position so the astronaut lands in the right half on a
+   laptop and stays in frame on a phone. */
+.hero-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 62% 40%;
+  transform: none;
+  filter: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+  z-index: -2;
+}
+
+/* ---------- shade: three black ramps, no hue ---------- */
+/* left to right for the copy, bottom for the frame, top for the fixed bar */
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(2, 5, 10, 0.96) 0%, rgba(2, 5, 10, 0.88) 28%, rgba(2, 5, 10, 0.55) 50%, rgba(2, 5, 10, 0.08) 74%, transparent 100%),
+    linear-gradient(0deg, rgba(2, 5, 10, 0.85) 0%, transparent 30%),
+    linear-gradient(180deg, rgba(2, 5, 10, 0.6) 0%, transparent 22%);
+}
+
+/* ---------- copy over the photograph ---------- */
+/* Vertically centred on the left, 6vw in from the edge, never wider than 640px */
+.hero-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(12px, 2vh, 22px);
+  padding: 0 clamp(20px, 6vw, 96px);
+  max-width: min(640px, 92vw);
+  min-height: 0;
+}
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.4vh, 26px);
+  min-width: 0;
+}
+
+/* the headline is the page: two lines, no third line, nothing competing */
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(36px, 4.1vw, 54px);
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+  font-weight: 680;
+  color: #fff;
+  text-shadow: 0 2px 26px rgba(0, 0, 0, 0.55);
+}
+.hero-title .l1,
+.hero-title .l2 { display: block; }
+/* second line: soft neutral light, no cyan, no gradient */
+.hero-title .l2 { color: #e8e8e8; }
+
+.hero-tagline {
+  font-size: clamp(17px, 1.5vw, 22px);
+  line-height: 1.45;
+  color: rgba(240, 243, 247, 0.9);
+  max-width: 42ch;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.6);
+}
+
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(4px, 1vh, 10px); }
+.hero-actions .btn {
+  padding: 14px 26px;
+  font-size: 16px;
+  border-radius: 12px;
+  text-shadow: none;
+}
+/* solid light button with dark text - the only strong element on the page */
+.hero-actions .btn-primary {
+  background: #f4f5f7;
+  border-color: #f4f5f7;
+  color: #07090d;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.42);
+}
+.hero-actions .btn-primary:hover {
+  background: #fff;
+  border-color: #fff;
+  color: #05070b;
+}
+/* transparent with a white hairline */
+.hero-actions .btn-ghost {
+  background: transparent;
+  border-color: #fff;
+  color: #fff;
+}
+.hero-actions .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #fff;
+  color: #fff;
+}
+
+/* ---------- phones ---------- */
+/* The photograph still covers the whole screen (focal point 70% / 35%), the
+   ramp runs bottom-up so the astronaut shows above a dark floor, and the copy
+   takes the lower part. */
+@media (max-width: 699px) {
+  .hero-img { object-position: 70% 35%; }
+
+  .hero-shade {
+    background:
+      linear-gradient(180deg, rgba(2, 5, 10, 0.72) 0%, rgba(2, 5, 10, 0) 14%),
+      linear-gradient(0deg, rgba(2, 5, 10, 0.97) 0%, rgba(2, 5, 10, 0.95) 40%, rgba(2, 5, 10, 0.88) 55%, rgba(2, 5, 10, 0.72) 65%, rgba(2, 5, 10, 0.48) 72%, rgba(2, 5, 10, 0.14) 80%, transparent 88%);
+  }
+
+  .hero-main {
+    justify-content: flex-end;
+    padding-inline: 20px;
+    padding-bottom: clamp(20px, 4vh, 40px);
+    max-width: none;
+  }
+  .hero-copy { gap: 12px; }
+  .hero-title { font-size: 36px; }
+  .hero-tagline { font-size: 17px; line-height: 1.4; }
+  .hero-actions { flex-direction: column; align-items: stretch; gap: 10px; margin-top: 4px; }
+  .hero-actions .btn { padding: 13px 18px; font-size: 16px; }
+}
+
+/* ---------- short laptops ---------- */
+@media (max-height: 700px) {
+  .hero-copy { gap: 10px; }
+  .hero-title { font-size: clamp(30px, 4vw, 48px); }
+  .hero-actions .btn { padding: 11px 22px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy { animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+}

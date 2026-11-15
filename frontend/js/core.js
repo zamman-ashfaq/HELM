@@ -501,10 +501,19 @@
 
     async ask(question, vitals) {
       if (!state.online) throw new Error("offline");
+      const last = latest();
       return api.request("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, vitals: vitals || null, astronaut_id: CFG.astronautId }),
+        // mode + mission day travel with the question so the server can build
+        // the prompt from real context instead of guessing it.
+        body: JSON.stringify({
+          question: question,
+          vitals: vitals || null,
+          astronaut_id: CFG.astronautId,
+          mode: state.mode,
+          mission_day: last.day == null ? null : last.day,
+        }),
       });
     },
 

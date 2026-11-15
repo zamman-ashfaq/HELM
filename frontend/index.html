@@ -8,55 +8,32 @@
 <meta name="description" content="HELM — astronaut health monitoring system. Intelligent healthcare beyond Earth's boundaries.">
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/home.css">
 </head>
 <body>
 <div class="shell" data-page="home" data-title="Home">
   <header class="site-nav" data-nav></header>
 
-  <!-- One screen, no scroll: the crew photograph fills the frame and the copy
-       sits on the left while the astronaut stays on the right. -->
-  <main class="home" id="home">
-    <img class="home-bg" src="assets/iss-astronaut.jpg" alt="" aria-hidden="true"
-         width="736" height="1104" decoding="async">
-    <figure class="home-shot">
-      <img src="assets/iss-astronaut.jpg" width="736" height="1104"
-           alt="Astronaut in a spacesuit floating inside an International Space Station module">
-    </figure>
-    <div class="home-veil" aria-hidden="true"></div>
+  <!-- One screen, no scroll: the ISS photograph covers the whole viewport, the
+       astronaut stays in the right half, the copy sits on the darkened left.
+       Heading, one tagline, two ways in. Nothing else. -->
+  <main class="hero" id="home">
+    <img class="hero-img" src="images/iss-hero.jpg" width="2400" height="1600"
+         alt="Astronaut working inside the International Space Station">
+    <div class="hero-shade" aria-hidden="true"></div>
 
-    <div class="wrap home-inner">
-      <div class="home-copy">
-        <span class="home-eyebrow"><span class="bar"></span>HELM · Crew health system</span>
-        <h1 class="home-title" id="homeTitle">
-          <span class="line-1">Astronaut health</span>
-          <span class="line-2">Monitoring system</span>
+    <div class="hero-main">
+      <div class="hero-copy">
+        <h1 class="hero-title">
+          <span class="l1">Astronaut health</span>
+          <span class="l2">Monitoring system</span>
         </h1>
-        <p class="home-sub">Intelligent Healthcare Beyond Earth's Boundaries.</p>
-        <div class="home-actions">
+        <p class="hero-tagline">Intelligent Healthcare Beyond Earth's Boundaries.</p>
+        <div class="hero-actions">
           <a class="btn btn-primary" href="assessment.html">Open health assessment</a>
           <a class="btn btn-ghost" href="assistant.html">Ask the AI assistant</a>
         </div>
       </div>
-    </div>
-
-    <div class="wrap">
-      <section class="home-strip" id="homeStrip" aria-label="Current crew snapshot">
-        <div class="strip-item">
-          <span class="strip-label">Wellness score</span>
-          <b class="strip-value" id="stripWellness">--</b>
-          <span class="strip-note" id="stripWellnessNote">mean of five domains</span>
-        </div>
-        <div class="strip-item">
-          <span class="strip-label">Signal to Earth</span>
-          <b class="strip-value" id="stripSignal">--</b>
-          <span class="strip-note" id="stripSignalNote">one way · --</span>
-        </div>
-        <div class="strip-item">
-          <span class="strip-label">Crew status</span>
-          <b class="strip-value is-status" id="stripStatus">--</b>
-          <span class="strip-note" id="stripStatusNote">worst domain right now</span>
-        </div>
-      </section>
     </div>
   </main>
 </div>
