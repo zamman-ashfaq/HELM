@@ -35,7 +35,16 @@
         <div class="panel" id="changePanel"></div>
       </section>
 
-      <section class="ana-grid" id="grid"></section>
+      <section class="ana-domains" aria-labelledby="domTitle">
+        <div class="panel-head" style="margin-bottom:12px">
+          <div>
+            <span class="eyebrow">Vital trends</span>
+            <h2 id="domTitle" style="margin-top:6px">By health domain</h2>
+          </div>
+        </div>
+        <div class="dom-tabs" id="domTabs" role="tablist" aria-label="Health domain"></div>
+        <div class="ana-grid" id="grid" role="tabpanel" tabindex="0"></div>
+      </section>
 
       <section class="panel" id="recordPanel"></section>
       </div>

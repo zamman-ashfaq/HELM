@@ -12,7 +12,9 @@
     ok: "#35e2a4", warn: "#f7b955", crit: "#ff6478", ink: "#a6b8cd", grid: "rgba(122,190,230,.16)",
   };
 
-  const W = 760;
+  // Default drawing width. Callers may pass opts.width so the chart is drawn at
+  // its real pixel width and axis labels keep their declared font size.
+  const DEFAULT_W = 760;
 
   function niceDomain(values, fixed) {
     if (fixed) return fixed.slice();
@@ -50,6 +52,7 @@
    * })
    */
   function line(opts) {
+    const W = opts.width || DEFAULT_W;
     const H = opts.height || 210;
     const pad = { l: 40, r: 14, t: 12, b: 24 };
     const labels = opts.labels || [];
@@ -91,10 +94,10 @@
       }
     });
 
-    // x labels (max 8)
+    // x labels (max 8, and never crowding the last one)
     const step = Math.max(1, Math.ceil(n / 8));
     labels.forEach((lab, i) => {
-      if (i % step !== 0 && i !== n - 1) return;
+      if (i !== n - 1 && (i % step !== 0 || n - 1 - i < step)) return;
       svg += '<text class="axis-text" x="' + x(i).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle">' + escapeHtml(lab) + "</text>";
     });
 
@@ -141,6 +144,7 @@
 
   /** Vertical bars with an optional target line. */
   function bars(opts) {
+    const W = opts.width || DEFAULT_W;
     const H = opts.height || 170;
     const pad = { l: 38, r: 12, t: 12, b: 22 };
     const values = opts.values || [];
@@ -173,7 +177,7 @@
     }
     const step = Math.max(1, Math.ceil(n / 8));
     labels.forEach((lab, i) => {
-      if (i % step !== 0 && i !== n - 1) return;
+      if (i !== n - 1 && (i % step !== 0 || n - 1 - i < step)) return;
       const cx = scaleX(i, n, pad.l + bw / 2, W - pad.r - bw / 2);
       svg += '<text class="axis-text" x="' + cx.toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle">' + escapeHtml(lab) + "</text>";
     });
